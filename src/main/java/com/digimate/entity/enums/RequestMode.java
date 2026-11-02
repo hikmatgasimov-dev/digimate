@@ -1,4 +1,4 @@
-package com.digimate.enums;
+package com.digimate.entity.enums;
 
 public enum RequestMode {
     IN_PERSON,
