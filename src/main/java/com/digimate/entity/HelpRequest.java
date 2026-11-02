@@ -1,7 +1,7 @@
 package com.digimate.entity;
 
-import com.digimate.entity.enums.RequestMode;
-import com.digimate.entity.enums.RequestStatus;
+import com.digimate.enums.RequestMode;
+import com.digimate.enums.RequestStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
