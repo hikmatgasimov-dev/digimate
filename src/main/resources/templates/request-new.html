@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('New request')}">
     <meta charset="UTF-8">
     <title>New request | DigiMate</title>
-    <link rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/app.css">
 </head>
 <body>
+<header th:replace="~{fragments/layout :: nav}"></header>
+
 <main class="container">
     <h1>Ask for help</h1>
     <p class="warning">Do not write passwords, PIN codes or card numbers.</p>
 
-    <form action="/requests" method="post">
+    <form th:action="@{/requests}" method="post">
         <div class="form-group">
             <label for="title">Title</label>
             <input id="title" name="title" type="text" value="Set up WhatsApp">
