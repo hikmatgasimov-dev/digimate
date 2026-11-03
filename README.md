@@ -46,5 +46,5 @@ The Boot 4 test starters in `pom.xml` already supply `spring-boot-starter-test`
 and Spring Security test support transitively.
 
 The proposed Sprint 1 test cases and unresolved contract questions are in
-[docs/TEST_CASES.md](docs/TEST_CASES.md). The list needs Hikmat's review; the README
+[docs/TEST_CASES.md](docs/Testing%20Strategy/TEST_CASES.md). The list needs Hikmat's review; the README
 test-setup instructions also need Mykolas's review, as requested in SCRUM-12.
