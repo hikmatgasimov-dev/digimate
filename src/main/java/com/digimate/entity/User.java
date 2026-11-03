@@ -4,7 +4,7 @@ package com.digimate.entity;
 import jakarta.persistence.*;
 import com.digimate.entity.enums.Role;
 import com.digimate.entity.enums.HelperStatus;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +43,6 @@ public class User {
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
 }
