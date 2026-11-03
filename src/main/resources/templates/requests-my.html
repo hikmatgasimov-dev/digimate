@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My requests')}">
     <meta charset="UTF-8">
     <title>My requests | DigiMate</title>
-    <link rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/app.css">
 </head>
 <body>
+<header th:replace="~{fragments/layout :: nav}"></header>
 <main class="container">
     <h1>My requests</h1>
-    <p><a class="btn" href="/requests/new">Ask for help</a></p>
+    <p><a class="btn" th:href="@{/requests/new}" href="request-new.html">Ask for help</a></p>
 
     <article class="card">
         <h2>Set up WhatsApp</h2>
         <p><span class="status status-open">Open</span></p>
         <p>Smartphone · In person · 10 Nov 2026, 15:00</p>
-        <form action="/requests/1/cancel" method="post">
+        <form th:action="@{/requests/1/cancel}" method="post">
             <button type="submit" class="btn-danger">Cancel request</button>
         </form>
     </article>
