@@ -17,7 +17,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.digimate.controller.api")
 public class GlobalExceptionHandler {
     //404
     @ExceptionHandler (RequestNotFoundException.class)

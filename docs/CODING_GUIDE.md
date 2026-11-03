@@ -7,7 +7,7 @@
 - One reviewer who is not the author. Squash-merge. Never push to `main`.
 
 ## Code
-- Java 21, Spring Boot 3.5.x, Maven. PostgreSQL only (no H2).
+- Java 21, Spring Boot 4.0.0, Maven, springdoc 3.0.0. PostgreSQL only 
 - Layers: controller -> service -> repository. Rules live in services. Controllers only translate HTTP.
 - Entities: `@Getter @Setter @NoArgsConstructor`, never `@Data`. Enums with `@Enumerated(EnumType.STRING)`.
 - DTOs are records. Validate with `@Valid` and Bean Validation.
