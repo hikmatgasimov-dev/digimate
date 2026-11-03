@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${title} + ' | DigiMate'">
+        DigiMate
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+<header th:fragment="nav">
+
+    <a class="skip-link" href="#main-content">
+        Skip to main content
+    </a>
+
+    <nav class="site-nav container"
+         aria-label="Main navigation">
+
+        <a class="brand" th:href="@{/}">
+            DigiMate
+        </a>
+
+        <div class="nav-links">
+
+            <!-- Guests -->
+            <div sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}">Log in</a>
+                <a th:href="@{/register}">Register</a>
+            </div>
+
+            <!-- Logged-in users -->
+            <div sec:authorize="isAuthenticated()">
+                <a th:href="@{/requests/my}">My requests</a>
+                <a th:href="@{/requests/new}">New request</a>
+                <a th:href="@{/helper}">Helper inbox</a>
+
+                <!-- Admin only -->
+                <a sec:authorize="hasRole('ADMIN')"
+                   th:href="@{/admin/helpers}">
+                    Admin: helpers
+                </a>
+
+                <!-- Secure logout -->
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="nav-button">
+                        Log out
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </nav>
+</header>
+
+</body>
+</html>
