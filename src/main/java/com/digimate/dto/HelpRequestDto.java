@@ -1,6 +1,7 @@
 package com.digimate.dto;
 
 import com.digimate.entity.enums.RequestMode;
+import com.digimate.validation.NoSensitiveData;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ public record HelpRequestDto(
 
         @NotBlank
         @Size(max = 1000)
+        @NoSensitiveData
         String description,
 
         @NotNull
