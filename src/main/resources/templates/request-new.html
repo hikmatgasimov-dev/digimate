@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New request | DigiMate</title>
+    <link rel="stylesheet">
+</head>
+<body>
+<main class="container">
+    <h1>Ask for help</h1>
+    <p class="warning">Do not write passwords, PIN codes or card numbers.</p>
+
+    <form action="/requests" method="post">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" value="Set up WhatsApp">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description">Help me install WhatsApp.</textarea>
+        </div>
+        <div class="form-group">
+            <label for="categoryId">Category</label>
+            <select id="categoryId" name="categoryId">
+                <option value="1">Smartphone</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="preferredTime">Preferred time</label>
+            <input id="preferredTime" name="preferredTime">
+        </div>
+        <fieldset class="form-group">
+            <legend>Mode</legend>
+            <input id="mode-in-person" name="mode" type="radio" value="IN_PERSON" checked>
+            <label for="mode-in-person">In person</label>
+            <input id="mode-online" name="mode" type="radio" value="ONLINE">
+            <label for="mode-online">Online</label>
+        </fieldset>
+        <div class="form-group">
+            <label for="place">Place (optional)</label>
+            <input id="place" name="place" type="text" value="City library">
+        </div>
+        <button type="submit" class="btn">Send request</button>
+    </form>
+</main>
+</body>
+</html>
