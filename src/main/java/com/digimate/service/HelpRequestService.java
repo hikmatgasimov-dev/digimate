@@ -60,6 +60,7 @@ public class HelpRequestService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public HelpRequestResponse findById(Long id, String username) {
         HelpRequest request = findRequest(id);
         User viewer = findUser(username);
@@ -85,6 +86,7 @@ public class HelpRequestService {
         return toResponse(request, customer);
     }
 
+    @Transactional
     public HelpRequestResponse cancel(Long id, String username) {
         HelpRequest request = findRequest(id);
         User customer = findUser(username);
@@ -109,7 +111,6 @@ public class HelpRequestService {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RequestNotFoundException("Category not found"));
     }
-
 
     private void requirePlaceForInPerson(HelpRequestDto dto) {
         if (dto.mode() == RequestMode.IN_PERSON && (dto.place() == null || dto.place().isBlank())) {
