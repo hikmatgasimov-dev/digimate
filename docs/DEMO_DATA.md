@@ -23,15 +23,15 @@ Demo data ready: 7 users and 5 categories created
 
 All accounts use `DEMO_PASSWORD`. Log in with the email.
 
-| Email | Role | Helper status | Use it for |
-|---|---|---|---|
-| `admin@digimate.test` | ADMIN | NONE | helper verification |
-| `helper@digimate.test` | USER | VERIFIED | accepting requests |
-| `pending@digimate.test` | USER | PENDING | the admin's pending list |
-| `customer1@digimate.test` | USER | NONE | creating requests |
-| `customer2@digimate.test` | USER | NONE | a second customer |
-| `helper2@digimate.test` | USER | VERIFIED | a second helper (two helpers competing for one request) |
-| `customer3@digimate.test` | USER | NONE | a third customer |
+| Email                     | Role  | Helper status | Use it for                                              |
+|---------------------------|-------|---------------|---------------------------------------------------------|
+| `admin@digimate.test`     | ADMIN | NONE          | helper verification                                     |
+| `helper@digimate.test`    | USER  | VERIFIED      | accepting requests                                      |
+| `pending@digimate.test`   | USER  | PENDING       | the admin's pending list                                |
+| `customer1@digimate.test` | USER  | NONE          | creating requests                                       |
+| `customer2@digimate.test` | USER  | NONE          | a second customer                                       |
+| `helper2@digimate.test`   | USER  | VERIFIED      | a second helper (two helpers competing for one request) |
+| `customer3@digimate.test` | USER  | NONE          | a third customer                                        |
 
 ## Categories
 
