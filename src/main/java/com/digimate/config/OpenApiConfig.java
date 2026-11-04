@@ -11,21 +11,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
+
     @Bean
     public OpenAPI digimateOpenAPI() {
-        String securitySchemeName = "basicAuth";
+        String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
                 .info(new Info()
                         .title("DigiMate API")
                         .version("1.0.0")
-                        .description("API documentation for the DigiMate application"))
+                        .description("API documentation for the DigiMate application. "
+                                + "Log in with POST /api/auth/login, then click Authorize and paste the token."))
                 .components(new Components()
                         .addSecuritySchemes(
                                 securitySchemeName,
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
-                                        .scheme("basic")
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
                         ))
                 .addSecurityItem(
                         new SecurityRequirement()
