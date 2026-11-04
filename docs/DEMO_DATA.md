@@ -12,12 +12,12 @@ IntelliJ: Run > Edit Configurations > DigimateApplication > Environment variable
 ```
 DEMO_PASSWORD=...
 ```
-Must be 8 charecters long.
+Must be at least 8 characters long and at most 72. Otherwise, only the categories are added.
 
 Start the application. The log shows:
 
 ```
-Demo data ready: 7 users and 5 categories created
+Demo data ready: 7 users and 6 categories created
 ```
 ## Accounts
 
@@ -35,7 +35,7 @@ All accounts use `DEMO_PASSWORD`. Log in with the email.
 
 ## Categories
 
-Smartphone, Computer, Online banking, Email, Video calls.
+6 categories, in this order: Health, Government services, Banking, Phone, Computer, Online safety.
 
 ## Shortcuts to check in pgAdmin
 

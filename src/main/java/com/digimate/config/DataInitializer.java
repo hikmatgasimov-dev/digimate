@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -23,12 +24,16 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     static final List<String> CATEGORIES = List.of(
-            "Smartphone",
+            "Health",
+            "Government services",
+            "Banking",
+            "Phone",
             "Computer",
-            "Online banking",
-            "Email",
-            "Video calls"
+            "Online safety"
     );
+
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_BYTES = 72;
 
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -55,8 +60,8 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        if (demoPassword.length() < 8) {
-            log.warn("DEMO_PASSWORD not set (min. 8 characters): demo accounts skipped, {} categories created",
+        if (!isValidDemoPassword()) {
+            log.warn("DEMO_PASSWORD not set (min. 8/ max. 72 characters): demo accounts skipped, {} categories created",
                     categoriesCreated);
             return;
         }
@@ -85,6 +90,11 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         log.info("Demo data ready: {} users and {} categories created", usersCreated, categoriesCreated);
+    }
+
+    private boolean isValidDemoPassword() {
+        return demoPassword.length() >= MIN_PASSWORD_LENGTH
+                && demoPassword.getBytes(StandardCharsets.UTF_8).length <= MAX_PASSWORD_BYTES;
     }
 
     private boolean addCategory(String name) {
