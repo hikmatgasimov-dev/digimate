@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.context.annotation.Import;
 /**
  * Two security chains:
  /api/**  : login with a JWT token (Bearer), no session, no CSRF.
@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@Import(JwtConfig.class)
 public class SecurityConfig {
 
     @Bean
