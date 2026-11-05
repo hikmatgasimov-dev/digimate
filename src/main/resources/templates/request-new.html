@@ -1,49 +1,205 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/layout :: head('New request')}">
     <meta charset="UTF-8">
-    <title>New request | DigiMate</title>
-    <link rel="stylesheet" href="../static/css/app.css">
+    <title>New Request | DigiMate</title>
 </head>
+
 <body>
+
 <header th:replace="~{fragments/layout :: nav}"></header>
 
-<main class="container">
-    <h1>Ask for help</h1>
-    <p class="warning">Do not write passwords, PIN codes or card numbers.</p>
+<main id="main-content" class="container">
 
-    <form th:action="@{/requests}" method="post">
+    <h1>Ask for help</h1>
+
+    <p class="muted">
+        Tell us what you need help with.
+        A helper can then respond to your request.
+    </p>
+
+    <!-- Privacy warning -->
+    <p class="warning" role="note">
+        For your safety, do not share passwords,
+        PIN codes, bank card numbers or other
+        sensitive personal information.
+    </p>
+
+    <!-- New request form -->
+    <form th:action="@{/requests/new}"
+          th:object="${form}"
+          method="post">
+
+        <!-- Title -->
         <div class="form-group">
-            <label for="title">Title</label>
-            <input id="title" name="title" type="text" value="Set up WhatsApp">
+
+            <label for="title">Request title</label>
+
+            <input type="text"
+                   id="title"
+                   th:field="*{title}"
+                   placeholder="e.g. Help with my laptop"
+                   maxlength="100"
+                   required>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('title')}"
+               th:errors="*{title}"></p>
+
         </div>
+
+        <!-- Description -->
         <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description">Help me install WhatsApp.</textarea>
+
+            <label for="description">
+                Description
+            </label>
+
+            <textarea id="description"
+                      th:field="*{description}"
+                      placeholder="Describe what you need help with..."
+                      maxlength="1000"
+                      rows="5"
+                      required></textarea>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('description')}"
+               th:errors="*{description}"></p>
+
         </div>
+
+        <!-- Category -->
         <div class="form-group">
-            <label for="categoryId">Category</label>
-            <select id="categoryId" name="categoryId">
-                <option value="1">Smartphone</option>
+
+            <label for="categoryId">
+                Category
+            </label>
+
+            <select id="categoryId"
+                    th:field="*{categoryId}"
+                    required>
+
+                <option value="">
+                    Select a category
+                </option>
+
+                <option th:each="category : ${categories}"
+                        th:value="${category.id}"
+                        th:text="${category.name}">
+                </option>
+
             </select>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('categoryId')}"
+               th:errors="*{categoryId}"></p>
+
         </div>
+
+        <!-- Preferred date and time -->
         <div class="form-group">
-            <label for="preferredTime">Preferred time</label>
-            <input id="preferredTime" name="preferredTime">
+
+            <label for="preferredTime">
+                Preferred date and time
+            </label>
+
+            <input type="datetime-local"
+                   id="preferredTime"
+                   th:field="*{preferredTime}"
+                   required>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('preferredTime')}"
+               th:errors="*{preferredTime}"></p>
+
         </div>
+
+        <!-- Help mode -->
         <fieldset class="form-group">
-            <legend>Mode</legend>
-            <input id="mode-in-person" name="mode" type="radio" value="IN_PERSON" checked>
-            <label for="mode-in-person">In person</label>
-            <input id="mode-online" name="mode" type="radio" value="ONLINE">
-            <label for="mode-online">Online</label>
+
+            <legend>
+                How would you like to receive help?
+            </legend>
+
+            <div>
+                <input type="radio"
+                       id="online"
+                       th:field="*{mode}"
+                       value="ONLINE">
+
+                <label for="online">
+                    Online
+                </label>
+            </div>
+
+            <div>
+                <input type="radio"
+                       id="inPerson"
+                       th:field="*{mode}"
+                       value="IN_PERSON">
+
+                <label for="inPerson">
+                    In person
+                </label>
+            </div>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('mode')}"
+               th:errors="*{mode}"></p>
+
         </fieldset>
+
+        <!-- Meeting place -->
         <div class="form-group">
-            <label for="place">Place (optional)</label>
-            <input id="place" name="place" type="text" value="City library">
+
+            <label for="place">
+                Meeting place
+            </label>
+
+            <input type="text"
+                   id="place"
+                   th:field="*{place}"
+                   placeholder="e.g. City library"
+                   maxlength="255">
+
+            <small class="hint">
+                Required for in-person requests.
+                Leave empty for online help.
+            </small>
+
+            <p class="field-error"
+               th:if="${#fields.hasErrors('place')}"
+               th:errors="*{place}"></p>
+
         </div>
-        <button type="submit" class="btn">Send request</button>
+
+        <!-- Action buttons -->
+        <div style="
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        ">
+
+            <!-- Submit request -->
+            <button type="submit" class="btn">
+                Send request
+            </button>
+
+            <!-- Cancel and return -->
+            <a class="btn btn-secondary"
+               th:href="@{/requests/my}">
+                Cancel
+            </a>
+
+        </div>
+
     </form>
+
 </main>
+
 </body>
 </html>
