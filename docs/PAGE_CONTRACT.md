@@ -71,3 +71,66 @@ Display rules:
 - Status badge: `class="status status-open"` (also `status-accepted`, `status-completed`, `status-cancelled`).
 - Show the counterpart block only when `counterpartName` is not null. The service decides, not the page.
 - `createdAt` is an `Instant` (UTC). Convert it to the app's time zone when formatting.
+
+## Rules for every page
+
+- Shared layout: `<head th:replace="~{fragments/layout :: head('Title')}">` and `<header th:replace="~{fragments/layout :: nav}">`.
+- `lang="en"`, one `<h1>`, `<main id="main-content" class="container">`.
+- Every input has a `<label>` with `for` matching the input's `id`. Inside a list, make ids unique: `rating-{id}`.
+- Only classes from `static/css/app.css`. The head fragment is replaced as a whole, so a page cannot add its own stylesheet.
+- Contact box: `<div class="success">`, shown only when `counterpartName` is not null.
+- Messages after a redirect (flash attributes): `successMessage` in `<output class="success">`, `errorMessage` in `<p class="error" role="alert">`.
+## Review form (in requests-my.html)
+
+Shown for `COMPLETED` requests when `reviewRating` is null. Otherwise the page shows the rating and comment.
+
+| Method | URL | Service call | Result |
+|---|---|---|---|
+| POST | `/requests/{id}/review` | `ReviewService.create(id, dto, username)` (to be built) | redirect `/requests/my`, `successMessage` |
+
+| Form field | Input | Rules |
+|---|---|---|
+| `rating` | `select`, values 1 to 5, `id="rating-{id}"` | required, 1 to 5 |
+| `comment` | `textarea`, `id="comment-{id}"` | optional, max 1000 |
+
+Suggested DTO: `ReviewDto(@NotNull @Min(1) @Max(5) Integer rating, @Size(max = 1000) @NoSensitiveData String comment)`.
+
+Extra model attribute for `requests-my`: `errorMessage` (`String` or absent, flash), e.g. when the request was already reviewed.
+
+Final buttons on `requests-my` (they replace the "Buttons" column above):
+
+| Status | Actions |
+|---|---|
+| `OPEN` | Edit (link to `/requests/{id}/edit`), Cancel request (POST, `btn btn-danger`) |
+| `ACCEPTED` | none (cancel is only allowed while `OPEN`, as in `HelpRequestService.cancel`) |
+| `COMPLETED` | review form, or the rating if reviewed |
+| `CANCELLED` | none |
+
+## Edit page
+
+`GET /requests/{id}/edit` renders `request-new.html` with `helpRequest` filled in and `editId` set.
+The `<h1>` says "Edit request" and the form posts to `/requests/{editId}`.
+`place` is required when `mode` is `IN_PERSON` (checked in the service, also on update).
+
+## helper-inbox.html (`HelperPageController`)
+
+| Method | URL | Service call | Result |
+|---|---|---|---|
+| GET  | `/helper` | `HelperFlowService.findOpen(username)` and `findMine(username)` (to be built) | `helper-inbox` |
+| POST | `/helper/requests/{id}/accept` | `HelperFlowService.accept(id, username)` | redirect `/helper`, `successMessage` |
+| POST | `/helper/requests/{id}/complete` | `HelperFlowService.complete(id, username)` | redirect `/helper`, `successMessage` |
+
+| Model attribute | Type | Notes |
+|---|---|---|
+| `openRequests` | `List<HelpRequestResponse>` | status `OPEN` only; contact fields are always null |
+| `myRequests` | `List<HelpRequestResponse>` | requests this helper accepted (`ACCEPTED` and `COMPLETED`) |
+| `successMessage` | `String` or absent | flash |
+| `errorMessage` | `String` or absent | flash, e.g. "This request was already accepted." |
+
+| Section | Shown per request | Action |
+|---|---|---|
+| Open requests | title, description, category, mode, place, preferred time | Accept (POST, `btn`) |
+| My accepted requests | status badge, contact box with the customer | Mark as completed (POST, `btn`), only while `ACCEPTED` |
+
+Only verified helpers may open `/helper`. The accept method checks the status again (`OPEN` only);
+if another helper was faster, redirect back with `errorMessage`.
