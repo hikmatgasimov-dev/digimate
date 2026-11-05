@@ -8,6 +8,8 @@ import com.digimate.entity.User;
 import com.digimate.entity.enums.RequestMode;
 import com.digimate.entity.enums.RequestStatus;
 import com.digimate.entity.enums.Role;
+import com.digimate.exception.InvalidStatusTransitionException;
+import com.digimate.exception.RequestNotFoundException;
 import com.digimate.repository.CategoryRepository;
 import com.digimate.repository.HelpRequestRepository;
 import com.digimate.repository.ReviewRepository;
@@ -18,7 +20,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,8 +30,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,6 +91,30 @@ class HelpRequestServiceTest {
     }
 
     @Test
+    void create_throwsWhenInPersonWithoutPlace() {
+        HelpRequestDto dto = new HelpRequestDto(requestDto.title(), requestDto.description(),
+                requestDto.categoryId(), requestDto.preferredTime(), RequestMode.IN_PERSON, null);
+
+        when(categoryRepository.findById(10L)).thenReturn(Optional.of(category));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> service.create(dto, EMAIL));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(helpRequestRepository, never()).save(any(HelpRequest.class));
+    }
+
+    @Test
+    void create_throwsNotFoundWhenCategoryMissing() {
+        when(categoryRepository.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(RequestNotFoundException.class, () -> service.create(requestDto, EMAIL));
+
+        verify(helpRequestRepository, never()).save(any(HelpRequest.class));
+    }
+
+    @Test
     void findMine_returnsCustomersRequests() {
         HelpRequest request = request();
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
@@ -130,6 +158,37 @@ class HelpRequestServiceTest {
     }
 
     @Test
+    void update_throwsConflictWhenRequestIsNotOpen() {
+        HelpRequest request = request();
+        request.setStatus(RequestStatus.ACCEPTED);
+
+        when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
+
+        assertThrows(InvalidStatusTransitionException.class,
+                () -> service.update(100L, requestDto, EMAIL));
+    }
+
+    @Test
+    void update_throwsForbiddenWhenNotTheCreator() {
+        HelpRequest request = request();
+        String originalTitle = request.getTitle();
+        User otherUser = new User();
+        otherUser.setId(2L);
+        otherUser.setEmail("other@example.com");
+        HelpRequestDto changed = new HelpRequestDto("Changed title", requestDto.description(),
+                requestDto.categoryId(), requestDto.preferredTime(), requestDto.mode(), requestDto.place());
+
+        when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(userRepository.findByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
+
+        assertThrows(AccessDeniedException.class,
+                () -> service.update(100L, changed, otherUser.getEmail()));
+
+        assertEquals(originalTitle, request.getTitle());
+    }
+
+    @Test
     void cancel_setsStatusCancelled() {
         HelpRequest request = request();
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
@@ -140,6 +199,43 @@ class HelpRequestServiceTest {
 
         assertEquals(RequestStatus.CANCELLED, response.status());
         assertEquals(RequestStatus.CANCELLED, request.getStatus());
+    }
+
+    @Test
+    void cancel_throwsForbiddenWhenNotTheCreator() {
+        HelpRequest request = request();
+        User otherUser = new User();
+        otherUser.setId(2L);
+        otherUser.setEmail("other@example.com");
+
+        when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(userRepository.findByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
+
+        assertThrows(AccessDeniedException.class, () -> service.cancel(100L, otherUser.getEmail()));
+
+        assertEquals(RequestStatus.OPEN, request.getStatus());
+    }
+
+    @Test
+    void cancel_throwsConflictWhenAlreadyAccepted() {
+        HelpRequest request = request();
+        request.setStatus(RequestStatus.ACCEPTED);
+        when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
+
+        assertThrows(InvalidStatusTransitionException.class, () -> service.cancel(100L, EMAIL));
+    }
+
+    @Test
+    void cancel_keepsTheRecord() {
+        HelpRequest request = request();
+        when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
+
+        service.cancel(100L, EMAIL);
+
+        assertEquals(RequestStatus.CANCELLED, request.getStatus());
+        verify(helpRequestRepository, never()).delete(any(HelpRequest.class));
     }
 
     private HelpRequest request() {
