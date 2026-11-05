@@ -7,16 +7,71 @@
 </head>
 <body>
 <header th:replace="~{fragments/layout :: nav}"></header>
-<main class="container">
-    <h1>My requests</h1>
-    <p><a class="btn" th:href="@{/requests/new}" href="request-new.html">Ask for help</a></p>
 
-    <article class="card">
-        <h2>Set up WhatsApp</h2>
-        <p><span class="status status-open">Open</span></p>
-        <p>Smartphone · In person · 10 Nov 2026, 15:00</p>
-        <form th:action="@{/requests/1/cancel}" method="post">
-            <button type="submit" class="btn-danger">Cancel request</button>
+<main id="main-content" class="container">
+    <h1>My requests</h1>
+
+    <output class="success" th:if="${successMessage}" th:text="${successMessage}">Your request was sent.</output>
+    <p class="error" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">Something went wrong.</p>
+
+    <p><a class="btn" th:href="@{/requests/new}">Ask for help</a></p>
+
+    <p class="muted" th:if="${#lists.isEmpty(requests)}">You have no requests yet.</p>
+
+    <article class="card" th:each="request : ${requests}">
+        <h2 th:text="${request.title}">Set up WhatsApp</h2>
+        <p><span class="status" th:classappend="${'status-' + #strings.toLowerCase(request.status)}"
+                 th:text="${#strings.capitalize(#strings.toLowerCase(request.status))}">Open</span></p>
+        <p>
+            <span th:text="${request.categoryName}">Phone</span> ·
+            <span th:text="${request.mode.name() == 'ONLINE'} ? 'Online' : 'In person'">In person</span>
+            <span th:if="${request.place}" th:text="${'· ' + request.place}">· City library</span>
+        </p>
+        <p th:text="${'Preferred time: ' + #temporals.format(request.preferredTime, 'd MMM yyyy, HH:mm')}">
+            Preferred time: 10 Nov 2026, 15:00</p>
+        <div class="success" th:if="${request.counterpartName}">
+            <h3>Your helper</h3>
+            <p th:text="${request.counterpartName}">Verified Helper</p>
+            <p th:if="${request.counterpartPhone}">Phone:
+                <a th:href="${'tel:' + request.counterpartPhone}" th:text="${request.counterpartPhone}">+37060000001</a>
+            </p>
+            <p th:if="${request.counterpartEmail}">Email:
+                <a th:href="${'mailto:' + request.counterpartEmail}" th:text="${request.counterpartEmail}">helper@digimate.test</a>
+            </p>
+        </div>
+
+        <th:block th:if="${request.status.name() == 'OPEN'}">
+            <p class="muted">Waiting for a helper.</p>
+            <a class="btn btn-secondary" th:href="@{/requests/{id}/edit(id=${request.id})}">Edit</a>
+            <form th:action="@{/requests/{id}/cancel(id=${request.id})}" method="post">
+                <button type="submit" class="btn btn-danger">Cancel request</button>
+            </form>
+        </th:block>
+
+        <p th:if="${request.status.name() == 'COMPLETED' and request.reviewRating != null}"
+           th:text="${'Your rating: ' + request.reviewRating + ' of 5' + (request.reviewComment != null ? ' – ' + request.reviewComment : '')}">
+            Your rating: 5 of 5 – Very patient, thank you!</p>
+
+        <form th:if="${request.status.name() == 'COMPLETED' and request.reviewRating == null}"
+              th:action="@{/requests/{id}/review(id=${request.id})}" method="post">
+            <h3>Rate the help</h3>
+            <div class="form-group">
+                <label for="rating-1" th:for="${'rating-' + request.id}">Rating
+                    <select id="rating-1" th:id="${'rating-' + request.id}" name="rating" required>
+                        <option value="5">5 – Excellent</option>
+                        <option value="4">4 – Good</option>
+                        <option value="3">3 – Okay</option>
+                        <option value="2">2 – Poor</option>
+                        <option value="1">1 – Bad</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="comment-1" th:for="${'comment-' + request.id}">Comment (optional)
+                    <textarea id="comment-1" th:id="${'comment-' + request.id}" name="comment" maxlength="1000" rows="3"></textarea>
+                </label>
+            </div>
+            <button type="submit" class="btn">Send rating</button>
         </form>
     </article>
 </main>
