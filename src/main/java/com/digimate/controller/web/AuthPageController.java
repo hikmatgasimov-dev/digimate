@@ -1,4 +1,4 @@
-package com.digimate.controller.api.web;
+package com.digimate.controller.web;
 
 import com.digimate.dto.RegisterRequest;
 import com.digimate.exception.EmailAlreadyUsedException;
