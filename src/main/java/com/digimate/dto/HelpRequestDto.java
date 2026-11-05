@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,7 @@ public record HelpRequestDto(
 
         @NotNull
         @Future
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
         LocalDateTime preferredTime,
 
         @NotNull

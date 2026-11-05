@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('New request')}">
+<head th:replace="~{fragments/layout :: head(${formTitle})}">
     <meta charset="UTF-8">
     <title>New Request | DigiMate</title>
+    <link rel="stylesheet" href="../static/css/app.css">
 </head>
 
 <body>
@@ -13,7 +14,7 @@
 
 <main id="main-content" class="container">
 
-    <h1>Ask for help</h1>
+    <h1 th:text="${formTitle}">Ask for help</h1>
 
     <p class="muted">
         Tell us what you need help with.
@@ -28,7 +29,7 @@
     </p>
 
     <!-- New request form -->
-    <form th:action="@{/requests/new}"
+    <form th:action="@{${formAction}}"
           th:object="${form}"
           method="post">
 
@@ -185,7 +186,7 @@
         ">
 
             <!-- Submit request -->
-            <button type="submit" class="btn">
+            <button type="submit" class="btn" th:text="${submitLabel}">
                 Send request
             </button>
 
