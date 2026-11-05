@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('New request')}">
+<head th:replace="~{fragments/layout :: head(${formTitle})}">
     <meta charset="UTF-8">
     <title>New Request | DigiMate</title>
+    <link rel="stylesheet" href="../static/css/app.css">
 </head>
 
 <body>
@@ -28,7 +29,7 @@
     </p>
 
     <!-- New request form -->
-    <form th:action="@{/requests/new}"
+    <form th:action="@{${formAction}}"
           th:object="${form}"
           method="post">
 

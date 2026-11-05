@@ -20,7 +20,7 @@
 
         <article class="card" th:each="request : ${openRequests}">
             <h3 th:text="${request.title}">Set up WhatsApp</h3>
-            <p th:text="${rrequest.description}">Please help me install WhatsApp.</p>
+            <p th:text="${request.description}">Please help me install WhatsApp.</p>
             <p>
                 <span th:text="${request.categoryName}">Online Safety</span> ·
                 <span th:text="${request.mode.name() == 'ONLINE'} ? 'Online' : 'In person'">In person</span>
@@ -59,7 +59,7 @@
                 <p th:text="${request.counterpartName}">Customer One</p>
                 <p th:if="${request.counterpartPhone}">Phone:
                     <a th:href="${'tel:' + request.counterpartPhone}" th:text="${request.counterpartPhone}">+37060000003</a></p>
-                <p th:if="${r.counterpartEmail}">Email:
+                <p th:if="${request.counterpartEmail}">Email:
                     <a th:href="${'mailto:' + request.counterpartEmail}" th:text="${request.counterpartEmail}">customer1@digimate.test</a></p>
             </div>
 
