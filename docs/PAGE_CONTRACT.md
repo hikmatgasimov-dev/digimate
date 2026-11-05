@@ -134,3 +134,56 @@ The `<h1>` says "Edit request" and the form posts to `/requests/{editId}`.
 
 Only verified helpers may open `/helper`. The accept method checks the status again (`OPEN` only);
 if another helper was faster, redirect back with `errorMessage`.
+
+## Browser authentication pages
+
+Templates:
+- `src/main/resources/templates/login.html`
+- `src/main/resources/templates/register.html`
+
+### Routes
+
+| Method | URL | Result |
+|---|---|---|
+| GET | `/login` | Render `login` |
+| POST | `/login` | Spring Security processes login |
+| GET | `/register` | Render `register` |
+| POST | `/register` | Register using `UserService` |
+| POST | `/logout` | Spring Security logs out |
+
+### login.html
+
+- Form action: `@{/login}`
+- Form method: POST
+- Email input: `name="username"`
+- Password input: `name="password"`
+- `param.error`: invalid credentials, class `error`
+- `param.logout`: successful logout, class `success`
+- `param.registered`: successful registration, class `success`
+
+### register.html
+
+Model attribute:
+- `form`: `RegisterRequest`
+
+Form action: `@{/register}`
+Form method: POST
+
+Fields:
+- `fullName`
+- `email`
+- `phone`
+- `password`
+- `wantsToHelp`: boolean checkbox, unchecked by default
+
+Validation:
+- Show field errors using `th:errors`
+- Error class: `field-error`
+- Duplicate email errors belong to field `email`
+- Invalid submissions redisplay `register.html`
+
+Successful registration redirects to `/login?registered`.
+
+Both templates use the shared `head` and `nav` fragments,
+`lang="en"`, one `h1`, and
+`<main id="main-content" class="container">`.
