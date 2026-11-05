@@ -34,6 +34,7 @@ public class RequestPageController {
     private static final String REDIRECT_MY_REQUESTS = "redirect:/requests/my";
     private static final String ERROR_MESSAGE = "errorMessage";
     private static final String SUCCESS_MESSAGE = "successMessage";
+    private static final String REQUEST_NOT_EXIST = "This request does not exist.";
 
 
     private final HelpRequestService helpRequestService;
@@ -137,7 +138,7 @@ public class RequestPageController {
             return FORM_VIEW;
 
         } catch (RequestNotFoundException e) {
-            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "This request does not exist.");
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
         } catch (AccessDeniedException e) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "You can only change your own requests.");
         }
@@ -183,7 +184,7 @@ public class RequestPageController {
         } catch (AccessDeniedException e) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "You can only change your own requests.");
         } catch (RequestNotFoundException e) {
-            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "This request does not exist.");
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
         }
         return REDIRECT_MY_REQUESTS;
     }
@@ -194,15 +195,16 @@ public class RequestPageController {
             @PathVariable Long id,
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
-        helpRequestService.cancel(
-                id,
-                authentication.getName()
-        );
-
-        redirectAttributes.addFlashAttribute(
-                SUCCESS_MESSAGE,
-                "Your request was cancelled."
-        );
+        try {
+            helpRequestService.cancel(id, authentication.getName());
+            redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Your request was cancelled.");
+        } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "This request can no longer be cancelled.");
+        } catch (AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "You can only cancel your own requests.");
+        } catch (RequestNotFoundException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
+        }
 
         return REDIRECT_MY_REQUESTS;
     }

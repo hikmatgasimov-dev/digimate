@@ -14,7 +14,7 @@
 
 <main id="main-content" class="container">
 
-    <h1>Ask for help</h1>
+    <h1 th:text="${formTitle}">Ask for help</h1>
 
     <p class="muted">
         Tell us what you need help with.
@@ -186,7 +186,7 @@
         ">
 
             <!-- Submit request -->
-            <button type="submit" class="btn">
+            <button type="submit" class="btn" th:text="${submitLabel}">
                 Send request
             </button>
 
