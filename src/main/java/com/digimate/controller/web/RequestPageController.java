@@ -2,14 +2,17 @@ package com.digimate.controller.web;
 
 import com.digimate.dto.HelpRequestDto;
 import com.digimate.dto.HelpRequestResponse;
+import com.digimate.dto.ReviewDto;
 import com.digimate.entity.Category;
 import com.digimate.entity.enums.RequestMode;
 import com.digimate.entity.enums.RequestStatus;
+import com.digimate.exception.DuplicateReviewException;
 import com.digimate.exception.InvalidStatusTransitionException;
 import com.digimate.exception.RequestNotFoundException;
 import com.digimate.repository.CategoryRepository;
 import com.digimate.service.HelpRequestService;
 
+import com.digimate.service.ReviewService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class RequestPageController {
 
     private final HelpRequestService helpRequestService;
     private final CategoryRepository categoryRepository;
+    private final ReviewService reviewService;
 
     // Display the form to create a new request
     @GetMapping("/requests/new")
@@ -255,6 +259,32 @@ public class RequestPageController {
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 
-    // TODO: Add the review POST endpoint when
-    // Hikmat's ReviewService is available.
+    // Rate a completed request (the form is in requests-my.html)
+    @PostMapping("/requests/{id}/review")
+    public String reviewRequest(
+            @PathVariable Long id,
+            @Valid @ModelAttribute ReviewDto form,
+            BindingResult result,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "Please choose a rating from 1 to 5.");
+            return REDIRECT_MY_REQUESTS;
+        }
+
+        try {
+            reviewService.create(id, form, authentication.getName());
+            redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Thank you. Your review is saved.");
+        } catch (DuplicateReviewException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "This request already has a review.");
+        } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "You can review a request only after it is completed.");
+        } catch (AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "You can only review your own requests.");
+        } catch (RequestNotFoundException e) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
+        }
+        return REDIRECT_MY_REQUESTS;
+    }
 }
