@@ -45,4 +45,18 @@ class AuthPageControllerTest {
         mockMvc.perform(get("/css/app.css"))
                 .andExpect(status().isOk());
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldSendAnAdminFromTheHomePageToTheHelpersPage() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/helpers"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldRefuseANormalUserOnTheAdminPages() throws Exception {
+        mockMvc.perform(get("/admin/helpers"))
+                .andExpect(status().isForbidden());
+    }
 }
