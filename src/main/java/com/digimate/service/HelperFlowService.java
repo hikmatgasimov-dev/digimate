@@ -64,7 +64,7 @@ public class HelperFlowService {
 
     @Transactional(readOnly = true)
     public List<HelpRequestResponse> findHelping(String username) {
-        User helper = findUser(username);
+        User helper = findVerifiedHelper(username);
         return helpRequestRepository.findByHelperOrderByCreatedAtDesc(helper).stream()
                 .map(request -> toResponse(request, helper))
                 .toList();
@@ -89,7 +89,7 @@ public class HelperFlowService {
     private User findVerifiedHelper(String email) {
         User user = findUser(email);
         if (user.getHelperStatus() != HelperStatus.VERIFIED) {
-            throw new HelperNotVerifiedException("Only verified helpers can do this");
+            throw new HelperNotVerifiedException(messageFor(user.getHelperStatus()));
         }
         return user;
     }
@@ -106,6 +106,15 @@ public class HelperFlowService {
     private HelpRequestResponse toResponse(HelpRequest request,User viewer){
         Review review = reviewRepository.findByRequestId(request.getId()).orElse(null);
         return HelpRequestResponse.from(request, viewer, review);
+    }
+
+    // A different text for each reason, so the person knows what to do next.
+    private String messageFor(HelperStatus status) {
+        return switch (status) {
+            case PENDING -> "Your helper account is waiting for approval";
+            case REMOVED -> "An admin removed your helper account";
+            default -> "You are not registered as a helper";
+        };
     }
 
 }

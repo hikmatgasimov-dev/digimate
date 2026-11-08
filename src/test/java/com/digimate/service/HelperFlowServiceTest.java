@@ -10,12 +10,15 @@ import com.digimate.entity.enums.HelperStatus;
 import com.digimate.entity.enums.RequestMode;
 import com.digimate.entity.enums.RequestStatus;
 import com.digimate.entity.enums.Role;
+import com.digimate.exception.HelperNotVerifiedException;
 import com.digimate.repository.HelpRequestRepository;
 import com.digimate.repository.ReviewRepository;
 import com.digimate.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +30,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(MockitoExtension.class)
 class HelperFlowServiceTest {
 
@@ -131,4 +134,30 @@ class HelperFlowServiceTest {
         assertThat(request.getStatus()).isEqualTo(RequestStatus.COMPLETED);
         assertThat(result.status()).isEqualTo(RequestStatus.COMPLETED);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "PENDING, Your helper account is waiting for approval",
+            "REMOVED, An admin removed your helper account",
+            "NONE,    You are not registered as a helper"
+    })
+    void shouldGiveAClearMessageToSomeoneWhoCannotHelp(HelperStatus status, String message) {
+        User notHelper = user(3L, "other@example.test", "Other Person", status);
+        when(userRepository.findByEmail("other@example.test")).thenReturn(Optional.of(notHelper));
+
+        assertThatThrownBy(() -> service.findOpen("other@example.test"))
+                .isInstanceOf(HelperNotVerifiedException.class)
+                .hasMessage(message);
+    }
+
+    @Test
+    void shouldRefuseTheAcceptedListForSomeoneWhoIsNotAVerifiedHelper() {
+        User pending = user(3L, "pending@example.test", "Pending Helper", HelperStatus.PENDING);
+        when(userRepository.findByEmail("pending@example.test")).thenReturn(Optional.of(pending));
+
+        assertThatThrownBy(() -> service.findHelping("pending@example.test"))
+                .isInstanceOf(HelperNotVerifiedException.class);
+    }
+
+
 }
