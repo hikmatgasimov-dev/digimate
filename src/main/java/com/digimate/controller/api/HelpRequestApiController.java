@@ -41,7 +41,8 @@ public class HelpRequestApiController {
             @ApiResponse(responseCode = "201", description = "The request was created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "401", description = "Not logged in"),
-            @ApiResponse(responseCode = "404", description = "Category not found")
+            @ApiResponse(responseCode = "404", description = "Category not found"),
+            @ApiResponse(responseCode = "403", description = "Admin accounts cannot ask for help"),
     })
     public HelpRequestResponse create(@Valid @RequestBody HelpRequestDto dto, Authentication authentication){
           return helpRequestService.create(dto,authentication.getName());
