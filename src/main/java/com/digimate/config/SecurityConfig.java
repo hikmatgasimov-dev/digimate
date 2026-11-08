@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/register",
                                 "/error",
                                 "/css/**",
+                                "/webjars/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"

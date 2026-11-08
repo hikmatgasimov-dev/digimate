@@ -37,4 +37,12 @@ class AuthPageControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
     }
+    @Test
+    @WithAnonymousUser
+    void shouldServeBootstrapAndOurStylesToAGuest() throws Exception {
+        mockMvc.perform(get("/webjars/bootstrap/5.3.8/css/bootstrap.min.css"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/css/app.css"))
+                .andExpect(status().isOk());
+    }
 }
