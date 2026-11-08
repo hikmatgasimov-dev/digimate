@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -152,5 +154,13 @@ class HelpRequestServiceTest {
         request.setCustomer(customer);
         request.setStatus(RequestStatus.OPEN);
         return request;
+    }
+    @Test
+    void create_refusesAnAdmin() {
+        customer.setRole(Role.ADMIN);
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
+
+        assertThrows(AccessDeniedException.class, () -> service.create(requestDto, EMAIL));
+        verify(helpRequestRepository, never()).save(any(HelpRequest.class));
     }
 }

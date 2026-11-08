@@ -14,6 +14,7 @@ public record HelpRequestDto(
 
         @NotBlank
         @Size(max = 100)
+        @NoSensitiveData
         String title,
 
         @NotBlank
@@ -33,6 +34,7 @@ public record HelpRequestDto(
         RequestMode mode,
 
         @Size(max = 255)
+        @NoSensitiveData
         String place
 ) {
 }

@@ -1,5 +1,6 @@
 package com.digimate.dto;
 
+import com.digimate.validation.NoSensitiveData;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ public record ReviewDto(
         Integer rating,
 
         @Size(max = 1000)
+        @NoSensitiveData
         String comment
 ) {
 }
