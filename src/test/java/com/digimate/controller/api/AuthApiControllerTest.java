@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * MVC tests for public registration validation and duplicate-email error handling.
@@ -174,5 +175,16 @@ class AuthApiControllerTest {
 
     private static RegisterRequest registration(String email, String password) {
         return new RegisterRequest("Anna Novak", email, "+37120000001", password, false);
+    }
+    @Test
+    void shouldRegisterWhenTheHelperPreferenceIsMissing() throws Exception {
+        String json = """
+                {"fullName":"Anna Novak","email":"anna.novak@example.com","phone":"+37120000001","password":"secure-password-123"}
+                """;
+
+        mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isCreated());
+
+        verify(userService).register(any(RegisterRequest.class));
     }
 }

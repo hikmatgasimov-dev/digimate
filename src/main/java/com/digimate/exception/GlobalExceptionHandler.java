@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -97,7 +98,11 @@ public class GlobalExceptionHandler {
         // Spring's own web errors (unknown URL, wrong HTTP method) already know their status
         if (ex instanceof org.springframework.web.ErrorResponse springError) {
             HttpStatus status = HttpStatus.valueOf(springError.getStatusCode().value());
-            return build(status, status.getReasonPhrase(), request);
+            // Our own ResponseStatusException carries a clear reason, for example "Place is required for in-person help"
+            String message = (ex instanceof ResponseStatusException responseError && responseError.getReason() != null)
+                    ? responseError.getReason()
+                    : status.getReasonPhrase();
+            return build(status, message, request);
         }
         log.error("Unexpected error on {}", request.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong. Please try again later.", request);
