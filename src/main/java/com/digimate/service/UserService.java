@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.digimate.dto.RemoveHelperDto;
 
 import java.util.List;
 import java.util.Locale;
@@ -77,5 +78,22 @@ public class UserService {
         return UserResponse.from(user);
 
     }
+    /** The admin sees every user. Not implemented yet. */
+    @Transactional(readOnly = true)
+    public List<UserResponse>findAll(){
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
+    /** The admin sees the verified helpers. Not implemented yet. */
+    @Transactional(readOnly = true)
+    public List<UserResponse>findVerifiedHelpers(){
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+    /** The admin removes a helper. Not implemented yet. */
+    @Transactional
+    public UserResponse removeHelper(Long id, RemoveHelperDto dto) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
 
 }
