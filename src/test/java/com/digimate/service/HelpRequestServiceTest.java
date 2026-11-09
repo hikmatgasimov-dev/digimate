@@ -87,6 +87,18 @@ class HelpRequestServiceTest {
     }
 
     @Test
+    void create_shouldRefuseCreateForAnAdmin() {
+        User admin = new User();
+        admin.setId(2L);
+        admin.setEmail("admin@example.com");
+        admin.setRole(Role.ADMIN);
+        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
+
+        assertThrows(AccessDeniedException.class, () -> service.create(requestDto, "admin@example.com"));
+        verify(helpRequestRepository, never()).save(any());
+    }
+
+    @Test
     void findMine_returnsCustomersRequests() {
         HelpRequest request = request();
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));

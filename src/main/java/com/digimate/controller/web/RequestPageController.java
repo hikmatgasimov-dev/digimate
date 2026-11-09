@@ -38,6 +38,7 @@ public class RequestPageController {
     private static final String ERROR_MESSAGE = "errorMessage";
     private static final String SUCCESS_MESSAGE = "successMessage";
     private static final String REQUEST_NOT_EXIST = "This request does not exist.";
+    private static final String ADMIN_CANNOT_CREATE = "Creating requests is not available for admins.";
 
 
     private final HelpRequestService helpRequestService;
@@ -46,7 +47,14 @@ public class RequestPageController {
 
     // Display the form to create a new request
     @GetMapping("/requests/new")
-    public String newRequest(Model model) {
+    public String newRequest(Model model,
+                             Authentication authentication,
+                             RedirectAttributes redirectAttributes) {
+
+        if (isAdmin(authentication)) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ADMIN_CANNOT_CREATE);
+            return REDIRECT_MY_REQUESTS;
+        }
 
         model.addAttribute("form",
                 new HelpRequestDto(
@@ -67,6 +75,11 @@ public class RequestPageController {
             Model model,
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
+
+        if (isAdmin(authentication)) {
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE, ADMIN_CANNOT_CREATE);
+            return REDIRECT_MY_REQUESTS;
+        }
 
         // Place is required for in-person requests
         if (form.mode() == RequestMode.IN_PERSON
