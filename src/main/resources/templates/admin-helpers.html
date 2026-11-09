@@ -1,30 +1,54 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/layout :: head('Helpers')}">
     <meta charset="UTF-8">
     <title>Helpers | DigiMate</title>
 </head>
+
 <body>
+
 <header th:replace="~{fragments/layout :: nav}"></header>
 
-<main id="main-content" class="container py-4">
+<main id="main-content" class="container"
+      th:with="helpers=${helpers != null ? helpers : pending}">
+
     <h1>Helpers</h1>
 
+    <!-- Success message -->
     <div class="alert alert-success" role="alert"
-         th:if="${successMessage}" th:text="${successMessage}">Done.</div>
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+        Done.
+    </div>
+
+    <!-- Error message -->
     <div class="alert alert-danger" role="alert"
-         th:if="${errorMessage}" th:text="${errorMessage}">Something went wrong.</div>
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+        Something went wrong.
+    </div>
 
     <!-- 1. Waiting for approval -->
     <section aria-labelledby="pending-heading">
-        <h2 id="pending-heading" class="mt-5 mb-3">Waiting for approval</h2>
 
-        <p class="text-muted" th:if="${#lists.isEmpty(pending)}">
+        <h2 id="pending-heading" class="mt-5 mb-3">
+            Waiting for approval
+        </h2>
+
+        <!-- Empty list -->
+        <p class="text-muted"
+           th:if="${#lists.isEmpty(helpers)}">
             No helpers are waiting. New helpers appear here after they register.
         </p>
 
-        <div class="table-responsive" th:unless="${#lists.isEmpty(pending)}">
+        <!-- Pending helpers table -->
+        <div class="table-responsive"
+             th:unless="${#lists.isEmpty(helpers)}">
+
             <table class="table table-hover align-middle">
+
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -32,62 +56,140 @@
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr th:each="helper : ${pending}">
-                    <td th:text="${helper.fullName}">Pending Helper</td>
-                    <td th:text="${helper.email}">pending@digimate.test</td>
+                <tr th:each="helper : ${helpers}">
+
+                    <td th:text="${helper.fullName}">
+                        Pending Helper
+                    </td>
+
+                    <td th:text="${helper.email}">
+                        pending@digimate.test
+                    </td>
+
                     <td>
-                        <form th:action="@{/admin/helpers/{id}/verify(id=${helper.id})}" method="post">
-                            <button type="submit" class="btn btn-primary btn-sm">Verify</button>
+                        <form th:action="@{/admin/helpers/{id}/verify(id=${helper.id})}"
+                              method="post">
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm">
+                                Verify
+                            </button>
+
                         </form>
                     </td>
+
                 </tr>
                 </tbody>
+
             </table>
         </div>
+
     </section>
 
     <!-- 2. Reports from customers -->
     <section aria-labelledby="reports-heading">
-        <h2 id="reports-heading" class="mt-5 mb-3">Reports from customers</h2>
 
-        <p class="text-muted" th:if="${#lists.isEmpty(reports)}">No open reports.</p>
+        <h2 id="reports-heading" class="mt-5 mb-3">
+            Reports from customers
+        </h2>
 
-        <article class="card shadow-sm mb-3" th:each="report : ${reports}">
+        <p class="text-muted"
+           th:if="${#lists.isEmpty(reports)}">
+            No open reports.
+        </p>
+
+        <article class="card shadow-sm mb-3"
+                 th:each="report : ${reports}">
+
             <div class="card-body">
-                <h3 class="h5 card-title" th:text="${'Report about ' + report.helperName}">Report about Helper One</h3>
+
+                <h3 class="h5 card-title"
+                    th:text="${'Report about ' + report.helperName}">
+                    Report about Helper One
+                </h3>
+
                 <p class="text-muted mb-2"
                    th:text="${report.helperEmail + ' | reported by ' + report.customerFirstName + ' | request number ' + report.requestId}">
                     helper@digimate.test | reported by Anna | request number 4
                 </p>
-                <p th:text="${report.text}">The helper did not show up.</p>
 
-                <form th:action="@{/admin/complaints/{id}/dismiss(id=${report.id})}" method="post" class="mb-3">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">Dismiss</button>
+                <p th:text="${report.text}">
+                    The helper did not show up.
+                </p>
+
+                <!-- Dismiss report -->
+                <form th:action="@{/admin/complaints/{id}/dismiss(id=${report.id})}"
+                      method="post"
+                      class="mb-3">
+
+                    <button type="submit"
+                            class="btn btn-outline-primary btn-sm">
+                        Dismiss
+                    </button>
+
                 </form>
 
+                <!-- Remove reported helper -->
                 <details>
-                    <summary class="text-danger fw-bold">Remove helper</summary>
-                    <form th:action="@{/admin/helpers/{id}/remove(id=${report.helperId})}" method="post" class="mt-2">
-                        <label class="form-label" th:for="${'reason-report-' + report.id}">Reason (required)</label>
-                        <textarea class="form-control mb-2" th:id="${'reason-report-' + report.id}"
-                                  name="reason" rows="3" maxlength="500" required></textarea>
-                        <div class="form-text mb-2">Do not write ID or card numbers.</div>
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove helper</button>
+
+                    <summary class="text-danger fw-bold">
+                        Remove helper
+                    </summary>
+
+                    <form th:action="@{/admin/helpers/{id}/remove(id=${report.helperId})}"
+                          method="post"
+                          class="mt-2">
+
+                        <label class="form-label"
+                               th:for="${'reason-report-' + report.id}">
+                            Reason (required)
+                        </label>
+
+                        <textarea class="form-control mb-2"
+                                  th:id="${'reason-report-' + report.id}"
+                                  name="reason"
+                                  rows="3"
+                                  maxlength="500"
+                                  required></textarea>
+
+                        <div class="form-text mb-2">
+                            Do not write ID or card numbers.
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-outline-danger btn-sm">
+                            Remove helper
+                        </button>
+
                     </form>
+
                 </details>
+
             </div>
+
         </article>
+
     </section>
 
     <!-- 3. Verified helpers -->
     <section aria-labelledby="verified-heading">
-        <h2 id="verified-heading" class="mt-5 mb-3">Verified helpers</h2>
 
-        <p class="text-muted" th:if="${#lists.isEmpty(verified)}">No verified helpers.</p>
+        <h2 id="verified-heading" class="mt-5 mb-3">
+            Verified helpers
+        </h2>
 
-        <div class="table-responsive" th:unless="${#lists.isEmpty(verified)}">
+        <p class="text-muted"
+           th:if="${#lists.isEmpty(verified)}">
+            No verified helpers.
+        </p>
+
+        <div class="table-responsive"
+             th:unless="${#lists.isEmpty(verified)}">
+
             <table class="table table-hover align-middle">
+
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -95,27 +197,64 @@
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
+
                 <tbody>
                 <tr th:each="helper : ${verified}">
-                    <td th:text="${helper.fullName}">Helper One</td>
-                    <td th:text="${helper.email}">helper@digimate.test</td>
+
+                    <td th:text="${helper.fullName}">
+                        Helper One
+                    </td>
+
+                    <td th:text="${helper.email}">
+                        helper@digimate.test
+                    </td>
+
                     <td>
                         <details>
-                            <summary class="text-danger fw-bold">Remove helper</summary>
-                            <form th:action="@{/admin/helpers/{id}/remove(id=${helper.id})}" method="post" class="mt-2">
-                                <label class="form-label" th:for="${'reason-helper-' + helper.id}">Reason (required)</label>
-                                <textarea class="form-control mb-2" th:id="${'reason-helper-' + helper.id}"
-                                          name="reason" rows="3" maxlength="500" required></textarea>
-                                <div class="form-text mb-2">Do not write ID or card numbers.</div>
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Remove helper</button>
+
+                            <summary class="text-danger fw-bold">
+                                Remove helper
+                            </summary>
+
+                            <form th:action="@{/admin/helpers/{id}/remove(id=${helper.id})}"
+                                  method="post"
+                                  class="mt-2">
+
+                                <label class="form-label"
+                                       th:for="${'reason-helper-' + helper.id}">
+                                    Reason (required)
+                                </label>
+
+                                <textarea class="form-control mb-2"
+                                          th:id="${'reason-helper-' + helper.id}"
+                                          name="reason"
+                                          rows="3"
+                                          maxlength="500"
+                                          required></textarea>
+
+                                <div class="form-text mb-2">
+                                    Do not write ID or card numbers.
+                                </div>
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger btn-sm">
+                                    Remove helper
+                                </button>
+
                             </form>
+
                         </details>
                     </td>
+
                 </tr>
                 </tbody>
+
             </table>
+
         </div>
+
     </section>
+
 </main>
 
 </body>
