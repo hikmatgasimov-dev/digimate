@@ -242,9 +242,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldPreserveStatusOfSpringWebError() throws Exception {
+    void shouldPreserveStatusOfSpringWebErrorWithoutReason() throws Exception {
         when(helpRequestService.findById(17L, USERNAME))
-                .thenThrow(new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Internal error detail"));
+                .thenThrow(new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED));
 
         ResultActions result = mockMvc.perform(get(PATH));
 
