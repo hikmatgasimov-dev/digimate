@@ -38,8 +38,11 @@ public class HelpRequestService {
 
     @Transactional
     public HelpRequestResponse create(HelpRequestDto dto, String username) {
-        Category category = findCategory(dto.categoryId());
         User customer = findUser(username);
+        if (customer.getRole() == Role.ADMIN) {
+            throw new AccessDeniedException("Admin accounts cannot ask for help");
+        }
+        Category category = findCategory(dto.categoryId());
         requirePlaceForInPerson(dto);
 
         HelpRequest request = new HelpRequest();

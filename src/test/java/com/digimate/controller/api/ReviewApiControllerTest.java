@@ -106,4 +106,12 @@ class ReviewApiControllerTest {
 
         verifyNoInteractions(reviewService);
     }
+    @Test
+    void shouldReturn400WhenTheCommentContainsACardNumber() throws Exception {
+        mockMvc.perform(post("/api/requests/5/review").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"rating\":5,\"comment\":\"Card 4111 1111 1111 1111\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(reviewService, never()).create(any(), any(), any());
+    }
 }

@@ -10,10 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -97,5 +100,42 @@ class HelpRequestApiControllerTest {
         mockMvc.perform(delete("/api/requests/5")).andExpect(status().isNoContent());
 
         verify(helpRequestService).cancel(5L, "anna@example.test");
+    }
+    @Test
+    void shouldReturn400WhenTheTitleContainsACardNumber() throws Exception {
+        String body = BODY.replace("Set up WhatsApp", "Pay with 4111 1111 1111 1111");
+
+        mockMvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest());
+
+        verify(helpRequestService, never()).create(any(), any());
+    }
+
+    @Test
+    void shouldReturn400WhenThePlaceContainsACardNumber() throws Exception {
+        String body = BODY.replace("City library", "Card 4111 1111 1111 1111");
+
+        mockMvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest());
+
+        verify(helpRequestService, never()).create(any(), any());
+    }
+
+    @Test
+    void shouldReturn403WhenAnAdminTriesToCreateARequest() throws Exception {
+        when(helpRequestService.create(any(HelpRequestDto.class), any()))
+                .thenThrow(new AccessDeniedException("Admin accounts cannot ask for help"));
+
+        mockMvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isForbidden());
+    }
+    @Test
+    void shouldShowTheRealMessageWhenTheInPersonPlaceIsMissing() throws Exception {
+        when(helpRequestService.create(any(HelpRequestDto.class), any()))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Place is required for in-person help"));
+
+        mockMvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Place is required for in-person help"));
     }
 }

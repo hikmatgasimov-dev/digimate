@@ -47,7 +47,7 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(request.password()));
 
         // The role is never read from the request, so nobody can register as ADMIN.
-        user.setRole(Role.USER); user.setHelperStatus(request.wantsToHelp() ? HelperStatus.PENDING : HelperStatus.NONE);
+        user.setRole(Role.USER); user.setHelperStatus(Boolean.TRUE.equals(request.wantsToHelp()) ? HelperStatus.PENDING : HelperStatus.NONE);
 
         User saved=userRepository.save(user);
         log.info("User registered :userId={}",saved.getId());
