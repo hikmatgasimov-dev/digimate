@@ -33,12 +33,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 @WebMvcTest(HelpRequestApiController.class)
 @Import(SecurityConfig.class)
 @WithMockUser(username = "anna@example.test")
 class HelpRequestApiControllerTest {
-
+    @MockitoBean
+    JwtDecoder jwtDecoder;
     @Autowired MockMvc mockMvc;
     @MockitoBean HelpRequestService helpRequestService;
 
