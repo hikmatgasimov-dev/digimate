@@ -107,10 +107,13 @@ class HelpRequestServiceTest {
 
     @Test
     void create_throwsNotFoundWhenCategoryMissing() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
         when(categoryRepository.findById(10L)).thenReturn(Optional.empty());
 
-        assertThrows(RequestNotFoundException.class, () -> service.create(requestDto, EMAIL));
+        RequestNotFoundException exception = assertThrows(RequestNotFoundException.class,
+                () -> service.create(requestDto, EMAIL));
 
+        assertEquals("Category not found", exception.getMessage());
         verify(helpRequestRepository, never()).save(any(HelpRequest.class));
     }
 
@@ -176,14 +179,15 @@ class HelpRequestServiceTest {
         User otherUser = new User();
         otherUser.setId(2L);
         otherUser.setEmail("other@example.com");
+        String otherUserEmail = otherUser.getEmail();
         HelpRequestDto changed = new HelpRequestDto("Changed title", requestDto.description(),
                 requestDto.categoryId(), requestDto.preferredTime(), requestDto.mode(), requestDto.place());
 
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
-        when(userRepository.findByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
+        when(userRepository.findByEmail(otherUserEmail)).thenReturn(Optional.of(otherUser));
 
         assertThrows(AccessDeniedException.class,
-                () -> service.update(100L, changed, otherUser.getEmail()));
+                () -> service.update(100L, changed, otherUserEmail));
 
         assertEquals(originalTitle, request.getTitle());
     }
@@ -207,11 +211,12 @@ class HelpRequestServiceTest {
         User otherUser = new User();
         otherUser.setId(2L);
         otherUser.setEmail("other@example.com");
+        String otherUserEmail = otherUser.getEmail();
 
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
-        when(userRepository.findByEmail(otherUser.getEmail())).thenReturn(Optional.of(otherUser));
+        when(userRepository.findByEmail(otherUserEmail)).thenReturn(Optional.of(otherUser));
 
-        assertThrows(AccessDeniedException.class, () -> service.cancel(100L, otherUser.getEmail()));
+        assertThrows(AccessDeniedException.class, () -> service.cancel(100L, otherUserEmail));
 
         assertEquals(RequestStatus.OPEN, request.getStatus());
     }
