@@ -7,11 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -70,6 +72,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadInput(Exception ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "The request could not be read. Please check the values.", request);
     }
+    // 401: wrong email or password at login (the same message for both)
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleBadLogin(AuthenticationException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED,
+                "Invalid email or password.", request);
+    }
 
     // 409: two people changed the same request at the same time (@Version)
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
@@ -90,7 +98,11 @@ public class GlobalExceptionHandler {
         // Spring's own web errors (unknown URL, wrong HTTP method) already know their status
         if (ex instanceof org.springframework.web.ErrorResponse springError) {
             HttpStatus status = HttpStatus.valueOf(springError.getStatusCode().value());
-            return build(status, status.getReasonPhrase(), request);
+            // Our own ResponseStatusException carries a clear reason, for example "Place is required for in-person help"
+            String message = (ex instanceof ResponseStatusException responseError && responseError.getReason() != null)
+                    ? responseError.getReason()
+                    : status.getReasonPhrase();
+            return build(status, message, request);
         }
         log.error("Unexpected error on {}", request.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong. Please try again later.", request);

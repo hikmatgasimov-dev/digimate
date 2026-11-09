@@ -23,7 +23,7 @@ public record RegisterRequest(
         @Size(min = 8, max = 72)
         String password,
 
-        boolean wantsToHelp
+        Boolean wantsToHelp
 
 ) {
 }
