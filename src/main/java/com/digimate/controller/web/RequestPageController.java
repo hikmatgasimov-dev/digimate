@@ -283,9 +283,14 @@ public class RequestPageController {
 
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, "Please choose a rating from 1 to 5.");
-            return REDIRECT_MY_REQUESTS;
+        } else {
+            saveReview(id, form, authentication, redirectAttributes);
         }
+        return REDIRECT_MY_REQUESTS;
+    }
 
+    private void saveReview(Long id, ReviewDto form, Authentication authentication,
+                            RedirectAttributes redirectAttributes) {
         try {
             reviewService.create(id, form, authentication.getName());
             redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Thank you. Your review is saved.");
@@ -298,6 +303,5 @@ public class RequestPageController {
         } catch (RequestNotFoundException e) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
         }
-        return REDIRECT_MY_REQUESTS;
     }
 }
