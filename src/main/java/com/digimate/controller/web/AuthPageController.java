@@ -20,10 +20,17 @@ public class AuthPageController {
 
     private final UserService userService;
 
+    // The brand link in the menu points to "/". Guests are sent to /login by the security chain.
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/requests/my";
+    }
+
     @GetMapping("/login")
     public String login() {
         return "login";
     }
+
 
     @GetMapping("/register")
     public String showRegister(Model model) {
