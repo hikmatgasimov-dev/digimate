@@ -5,9 +5,10 @@
     <title>Helpers | DigiMate</title>
 </head>
 <body>
-<header th:replace="~{fragments/layout :: nav('admin-helpers')}"></header></header>
+<header th:replace="~{fragments/layout :: nav('admin-helpers')}"></header>
 
-<main id="main-content" class="container py-4">
+<main id="main-content" class="container py-4"
+      th:with="helpers=${helpers != null ? helpers : pending}">
     <h1>Helpers</h1>
 
     <div class="alert alert-success" role="alert"
@@ -19,11 +20,11 @@
     <section aria-labelledby="pending-heading">
         <h2 id="pending-heading" class="mt-5 mb-3">Waiting for approval</h2>
 
-        <p class="text-muted" th:if="${#lists.isEmpty(pending)}">
+        <p class="text-muted" th:if="${#lists.isEmpty(helpers)}">
             No helpers are waiting. New helpers appear here after they register.
         </p>
 
-        <div class="table-responsive" th:unless="${#lists.isEmpty(pending)}">
+        <div class="table-responsive" th:unless="${#lists.isEmpty(helpers)}">
             <table class="table table-hover align-middle">
                 <thead>
                 <tr>
@@ -33,7 +34,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="helper : ${pending}">
+                <tr th:each="helper : ${helpers}">
                     <td th:text="${helper.fullName}">Pending Helper</td>
                     <td th:text="${helper.email}">pending@digimate.test</td>
                     <td>
