@@ -47,15 +47,13 @@ public class AdminPageController {
 
         model.addAttribute("pending", userService.findPendingHelpers());
         model.addAttribute("reports", complaintService.findOpen());
-
-        model.addAttribute("verified", userService.findPendingHelpers());
+        model.addAttribute("verified", userService.findVerifiedHelpers());
 
         return "admin-helpers";
 
     }
 
     // Every user on the platform, without phone numbers
-
     @GetMapping("/admin/users")
     public String usersModel(Model model) {
 
