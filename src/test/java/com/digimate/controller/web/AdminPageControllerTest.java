@@ -91,35 +91,40 @@ class AdminPageControllerTest {
 
 
 
+
+
     @Test
-    void shouldShowTheWaitingHelpersAndTheOpenReportsOnTheHelpersPage() throws Exception {
+    void shouldShowTheThreeListsOnTheHelpersPage() throws Exception {
         List<UserResponse> pending = List.of(user(3L, "Pending Helper", HelperStatus.PENDING));
         List<ComplaintResponse> reports = List.of(report(1L));
+        List<UserResponse> verified = List.of(user(2L, "Helper One", HelperStatus.VERIFIED));
         when(userService.findPendingHelpers()).thenReturn(pending);
         when(complaintService.findOpen()).thenReturn(reports);
+        when(userService.findVerifiedHelpers()).thenReturn(verified);
 
         mockMvc.perform(get("/admin/helpers"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin-helpers"))
                 .andExpect(model().attribute("pending", pending))
                 .andExpect(model().attribute("reports", reports))
-                // empty for now: verified helpers come with the removal card
-                .andExpect(model().attribute("verified", List.of()));
+                .andExpect(model().attribute("verified", verified));
     }
-
 
     private static ComplaintResponse report(Long id) {
         return new ComplaintResponse(id, 4L, 2L, "Helper One", "helper@digimate.test", "Anna",
                 "The helper did not show up.", ComplaintStatus.OPEN, Instant.now());
     }
 
+
     @Test
-    void shouldOpenTheUsersPage() throws Exception {
+    void shouldShowAllUsersOnTheUsersPage() throws Exception {
+        List<UserResponse> users = List.of(user(1L, "Admin", HelperStatus.NONE), user(2L, "Helper One", HelperStatus.VERIFIED));
+        when(userService.findAll()).thenReturn(users);
+
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin-users"))
-                // empty for now: the list of all users comes with its own card
-                .andExpect(model().attribute("users", List.of()));
+                .andExpect(model().attribute("users", users));
     }
 
     // ---- verify ----
