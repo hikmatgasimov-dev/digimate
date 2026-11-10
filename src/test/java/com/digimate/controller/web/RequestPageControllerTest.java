@@ -111,9 +111,21 @@ class RequestPageControllerTest {
                         .param("preferredTime", preferredTime)
                         .param("mode", "IN_PERSON")
                         .param("place", "City library"))
-                .andExpect(redirectedUrl("/requests/my"));
-
+                .andExpect(redirectedUrl("/requests/my"))
+                .andExpect(flash().attribute(
+                        "errorMessage",
+                        "Creating requests is not available for admins."
+                ));
         verify(helpRequestService, never()).create(any(), any());
+
+    }
+    @Test
+    @WithMockUser(username = "anna@example.test", roles = "USER")
+    void shouldAllowNormalUserToOpenCreateForm() throws Exception {
+        mockMvc.perform(get("/requests/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("request-new"))
+                .andExpect(model().attributeExists("form"));
     }
     @Test
     void shouldReportProblemSuccessfully() throws Exception {
