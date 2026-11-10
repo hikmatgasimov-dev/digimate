@@ -11,6 +11,10 @@ import com.digimate.exception.InvalidStatusTransitionException;
 import com.digimate.exception.RequestNotFoundException;
 import com.digimate.repository.CategoryRepository;
 import com.digimate.service.HelpRequestService;
+import com.digimate.dto.ComplaintDto;
+import com.digimate.exception.DuplicateComplaintException;
+import com.digimate.service.ComplaintService;
+import jakarta.validation.Validator;
 
 import com.digimate.service.ReviewService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -44,6 +48,8 @@ public class RequestPageController {
     private final HelpRequestService helpRequestService;
     private final CategoryRepository categoryRepository;
     private final ReviewService reviewService;
+    private final ComplaintService complaintService;
+    private final Validator validator;
 
     // Display the form to create a new request
     @GetMapping("/requests/new")
@@ -125,7 +131,10 @@ public class RequestPageController {
                         authentication.getName()
                 )
         );
-
+        model.addAttribute(
+                "complaintStatuses",
+                complaintService.statusByRequest(authentication.getName())
+        );
         return "requests-my";
     }
 
@@ -303,5 +312,57 @@ public class RequestPageController {
         } catch (RequestNotFoundException e) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, REQUEST_NOT_EXIST);
         }
+    }
+    @PostMapping("/requests/{id}/complaint")
+    public String reportProblem(
+            @PathVariable Long id,
+            @RequestParam(required = false) String reason,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        ComplaintDto dto = new ComplaintDto(reason);
+
+        if (!validator.validate(dto).isEmpty()) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_MESSAGE,
+                    "Please describe the problem (up to 500 characters)."
+            );
+            return REDIRECT_MY_REQUESTS;
+        }
+
+        try {
+            complaintService.create(id, dto, authentication.getName());
+
+            redirectAttributes.addFlashAttribute(
+                    SUCCESS_MESSAGE,
+                    "Thank you. An admin will look at your report."
+            );
+
+        } catch (RequestNotFoundException e) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_MESSAGE,
+                    REQUEST_NOT_EXIST
+            );
+
+        } catch (AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_MESSAGE,
+                    "You can only report a problem on your own request."
+            );
+
+        } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_MESSAGE,
+                    "You can only report a problem after a helper accepted the request."
+            );
+
+        } catch (DuplicateComplaintException e) {
+            redirectAttributes.addFlashAttribute(
+                    ERROR_MESSAGE,
+                    "You already reported this request."
+            );
+        }
+
+        return REDIRECT_MY_REQUESTS;
     }
 }
