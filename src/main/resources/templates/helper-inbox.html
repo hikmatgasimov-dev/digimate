@@ -3,9 +3,7 @@
 <head th:replace="~{fragments/layout :: head('Helper inbox')}">
     <meta charset="UTF-8">
     <title>Helper inbox | DigiMate</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/app.css">
-    <link rel="stylesheet" href="../static/css/pages.css">
 </head>
 <body>
 <header th:replace="~{fragments/layout :: nav('helper')}"></header>
@@ -32,30 +30,10 @@
                 There are no open requests right now.
             </p>
 
-
-            <article class="card shadow-sm" th:each="request : ${openRequests}">
-                <div class="card-body">
-                    <div class="card-head">
-                        <h3 class="h5 card-title" th:text="${request.title}">Set up WhatsApp</h3>
-                        <span class="status status-open">Open</span>
-                    </div>
-                    <p class="meta">
-                        <span th:text="${request.categoryName}">Online Safety</span> |
-                        <span th:text="${request.mode.name() == 'ONLINE'} ? 'Online' : 'In person'">In person</span> |
-                        <span th:if="${request.place}" th:text="${'· ' + request.place}">City library</span>
-                    </p>
-                    <p class="mb-2"
-                       th:text="${'Preferred time: ' + #temporals.format(request.preferredTime, 'd MMM yyyy, HH:mm')}">
-                        Preferred time: 10 Nov 2026, 15:00
-                    </p>
-                    <p class="description" th:text="${request.description}">Please help me install WhatsApp.</p>
-                    <div class="actions">
-                        <form th:action="@{/helper/requests/{id}/accept(id=${request.id})}" method="post">
-                            <button type="submit" class="btn btn-primary btn-sm">Accept</button>
-                        </form>
-                    </div>
-                </div>
-            </article>
+            <!--Open request card-->
+            <th:block th:each="request : ${openRequests}">
+                <article th:replace="~{fragments/request-parts :: open-card(${request})}"></article>
+            </th:block>
 
         </section>
 
@@ -64,44 +42,10 @@
             <p class="text-center text-muted py-4" th:if="${#lists.isEmpty(myRequests)}">You have not accepted any
                 requests yet.</p>
 
-            <article class="card shadow-sm" th:each="request : ${myRequests}">
-                <div class="card-body">
-                    <div class="card-head">
-                        <h3 class="h5" th:text="${request.title}">Pay bills online</h3>
-                        <span class="status status-accepted"
-                              th:if="${request.status.name() == 'ACCEPTED'}">Accepted</span>
-                        <span class="status status-completed"
-                              th:if="${request.status.name() == 'COMPLETED'}">Completed</span>
-                    </div>
+            <th:block th:each="request : ${myRequests}">
+                <article th:replace="~{fragments/request-parts :: helping-card(${request})}"></article>
+            </th:block>
 
-                    <p class="meta">
-                        <span th:text="${request.categoryName}">Banking</span> |
-                        <span th:text="${request.mode.name() == 'ONLINE'} ? 'Online' : 'In person'">Online</span> |
-                        <span th:if="${request.place}" th:text="${'· ' + request.place}"></span> |
-                        <span th:text="${#temporals.format(request.preferredTime, 'd MMM yyyy, HH:mm')}">Preferred time: 11 Nov 2026, 10:00</span>
-                    </p>
-
-                    <div class="alert alert-success contact-box" th:if="${request.counterpartName}">
-                        <div>Your customer: <b th:text="${request.counterpartName}">Customer One</b></div>
-                        <div th:if="${request.counterpartPhone}">Phone:
-                            <b th:href="${'tel:' + request.counterpartPhone}"
-                               th:text="${request.counterpartPhone}">+37060000003</b>
-                            <div th:if="${request.counterpartEmail}">Email:
-                                <b th:href="${'mailto:' + request.counterpartEmail}"
-                                   th:text="${request.counterpartEmail}">customer1@digimate.test</b>
-                            </div>
-                            <div class="contact-hint">Only you two can see this.</div>
-                        </div>
-
-
-                    </div>
-                    <div class="actions" th:if="${request.status.name() == 'ACCEPTED'}">
-                        <form th:action="@{/helper/requests/{id}/complete(id=${request.id})}" method="post">
-                            <button type="submit" class="btn btn-outline-primary btn-sm">Mark as completed</button>
-                        </form>
-                    </div>
-                </div>
-            </article>
         </section>
     </th:block>
 </main>

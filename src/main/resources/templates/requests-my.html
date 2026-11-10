@@ -1,211 +1,49 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/layout :: head('My requests')}">
     <meta charset="UTF-8">
     <title>My requests | DigiMate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/app.css">
+    <link rel="stylesheet" href="../static/css/pages.css">
 </head>
 
 <body>
 
 <header th:replace="~{fragments/layout :: nav('requests')}"></header>
 
-<main id="main-content" class="container">
+<main id="main-content" class="container my-requests">
 
     <h1>My requests</h1>
 
+    <p class="ask-help" sec:authorize="!hasRole('ADMIN')">
+        <a class="btn btn-primary" th:href="@{/requests/new}">Ask for help</a>
+    </p>
+
+
     <!-- Success message -->
-    <output class="success"
+    <output class="alert alert-success d-block"
             th:if="${successMessage}"
             th:text="${successMessage}">
         Your request was sent.
     </output>
 
     <!-- Error message -->
-    <p class="error"
-       role="alert"
-       th:if="${errorMessage}"
-       th:text="${errorMessage}">
+    <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">
         Something went wrong.
-    </p>
-
-    <!-- New request button -->
-    <p sec:authorize="!hasRole('ADMIN')">
-        <a class="btn" th:href="@{/requests/new}">
-            Ask for help
-        </a>
-    </p>
+    </div>
 
     <!-- Empty request list -->
-    <p class="muted"
+    <p class="empty text-center text-muted"
        th:if="${#lists.isEmpty(requests)}">
-        You have no requests yet.
+        You have no requests yet. Choose ‘Ask for help’ to create one.
     </p>
 
     <!-- Request cards -->
-    <article class="card"
-             th:each="request : ${requests}">
-
-        <!-- Request title -->
-        <h2 th:text="${request.title}">
-            Set up WhatsApp
-        </h2>
-
-        <!-- Request status -->
-        <p>
-            <span class="status"
-                  th:classappend="${'status-' + #strings.toLowerCase(request.status)}"
-                  th:text="${#strings.capitalize(#strings.toLowerCase(request.status))}">
-                Open
-            </span>
-        </p>
-
-        <!-- Category, mode and location -->
-        <p>
-            <span th:text="${request.categoryName}">
-                Phone
-            </span>
-            ·
-            <span th:text="${request.mode.name() == 'ONLINE'} ? 'Online' : 'In person'">
-                Online
-            </span>
-
-            <span th:if="${request.place}"
-                  th:text="${'· ' + request.place}">
-                · City library
-            </span>
-        </p>
-
-        <!-- Preferred time -->
-        <p th:text="${'Preferred time: ' + #temporals.format(request.preferredTime, 'd MMM yyyy, HH:mm')}">
-            Preferred time: 10 Nov 2026, 15:00
-        </p>
-
-        <!-- Helper information -->
-        <div class="success"
-             th:if="${request.counterpartName}">
-
-            <h3>Your helper</h3>
-
-            <p th:text="${request.counterpartName}">
-                Verified Helper
-            </p>
-
-            <p th:if="${request.counterpartPhone}">
-                Phone:
-                <a th:href="${'tel:' + request.counterpartPhone}"
-                   th:text="${request.counterpartPhone}">
-                    +37060000001
-                </a>
-            </p>
-
-            <p th:if="${request.counterpartEmail}">
-                Email:
-                <a th:href="${'mailto:' + request.counterpartEmail}"
-                   th:text="${request.counterpartEmail}">
-                    helper@digimate.test
-                </a>
-            </p>
-
-        </div>
-
-        <!-- Actions for open requests -->
-        <th:block th:if="${request.status.name() == 'OPEN'}">
-
-            <p class="muted">
-                Waiting for a helper.
-            </p>
-
-            <!-- Buttons with 12px spacing -->
-            <div style="
-                display: flex;
-                gap: 12px;
-                align-items: center;
-                flex-wrap: wrap;
-                margin-top: 16px;
-            ">
-
-                <!-- Edit request -->
-                <a class="btn btn-secondary"
-                   th:href="@{/requests/{id}/edit(id=${request.id})}">
-                    Edit
-                </a>
-
-                <!-- Cancel request -->
-                <form th:action="@{/requests/{id}/cancel(id=${request.id})}"
-                      method="post"
-                      style="margin: 0;">
-
-                    <button type="submit"
-                            class="btn btn-danger">
-                        Cancel request
-                    </button>
-
-                </form>
-
-            </div>
-
-        </th:block>
-
-        <!-- Existing review -->
-        <p th:if="${request.status.name() == 'COMPLETED' and request.reviewRating != null}"
-           th:text="${'Your rating: ' + request.reviewRating + ' of 5' + (request.reviewComment != null ? ' – ' + request.reviewComment : '')}">
-            Your rating: 5 of 5
-        </p>
-
-        <!-- Review form -->
-        <form th:if="${request.status.name() == 'COMPLETED' and request.reviewRating == null}"
-              th:action="@{/requests/{id}/review(id=${request.id})}"
-              method="post">
-
-            <h3>Rate the help</h3>
-
-            <div class="form-group">
-
-                <label for="rating-1"
-                       th:for="${'rating-' + request.id}">
-                    Rating
-                </label>
-
-                <select id="rating-1"
-                        th:id="${'rating-' + request.id}"
-                        name="rating"
-                        required>
-
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option>
-                    <option value="3">3 - Okay</option>
-                    <option value="2">2 - Poor</option>
-                    <option value="1">1 - Bad</option>
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="comment-1"
-                       th:for="${'comment-' + request.id}">
-                    Comment (optional)
-                </label>
-
-                <textarea id="comment-1"
-                          th:id="${'comment-' + request.id}"
-                          name="comment"
-                          maxlength="1000"
-                          rows="3"></textarea>
-
-            </div>
-
-            <button type="submit" class="btn">
-                Send rating
-            </button>
-
-        </form>
-
-    </article>
+    <th:block th:each="request : ${requests}">
+        <article th:replace="~{fragments/request-parts :: customer-card(${request}, ${complaintStatuses})}"></article>
+    </th:block>
 
 </main>
 
