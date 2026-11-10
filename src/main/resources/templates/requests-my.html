@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/layout :: head('My requests')}">
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 
 <body>
 
-<header th:replace="~{fragments/layout :: nav}"></header>
+<header th:replace="~{fragments/layout :: nav('requests')}"></header>
 
 <main id="main-content" class="container">
 
@@ -32,7 +32,7 @@
     </p>
 
     <!-- New request button -->
-    <p>
+    <p sec:authorize="!hasRole('ADMIN')">
         <a class="btn" th:href="@{/requests/new}">
             Ask for help
         </a>
