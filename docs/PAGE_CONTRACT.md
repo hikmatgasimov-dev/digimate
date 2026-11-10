@@ -187,3 +187,53 @@ Successful registration redirects to `/login?registered`.
 Both templates use the shared `head` and `nav` fragments,
 `lang="en"`, one `h1`, and
 `<main id="main-content" class="container">`.
+
+
+## Admin pages
+
+Only users with the ADMIN role can access these pages.
+
+### Admin helpers
+
+- GET `/admin/helpers`
+- Template: `admin-helpers.html`
+- POST `/admin/helpers/{id}/verify`
+
+Model attributes:
+- `helpers`: helpers waiting for approval (SCRUM-39)
+- `pending`: existing SCRUM-48 name, supported as a fallback
+- `verified`: verified helpers
+- `reports`: customer reports
+- `successMessage`: success notification
+- `errorMessage`: error notification
+
+Each pending helper has:
+- `id`
+- `fullName`
+- `email`
+
+The Verify button sends a POST request using
+`th:action` so Spring Security includes the CSRF token.
+
+### Admin users
+
+- GET `/admin/users`
+- Template: `admin-users.html`
+
+Model attributes:
+- `users`: list of registered users
+- `successMessage`: success notification
+- `errorMessage`: error notification
+
+Each user has:
+- `fullName`
+- `email`
+- `role`
+- `helperStatus`
+
+Account labels:
+- ADMIN: Admin
+- VERIFIED: Verified helper
+- PENDING: Helper waiting for approval
+- NONE: Customer
+- REMOVED: Helper removed by an admin

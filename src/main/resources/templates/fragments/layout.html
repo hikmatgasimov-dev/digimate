@@ -17,7 +17,7 @@
 
 <body>
 
-<header th:fragment="nav">
+<header th:fragment="nav(active)">
 
     <a class="skip-link" href="#main-content">
         Skip to main content
@@ -30,33 +30,67 @@
             DigiMate
         </a>
 
+
         <div class="nav-links">
 
             <!-- Guests -->
             <div sec:authorize="!isAuthenticated()">
-                <a th:href="@{/login}">Log in</a>
-                <a th:href="@{/register}">Register</a>
-            </div>
-
-            <!-- Logged-in users -->
-            <div sec:authorize="isAuthenticated()">
-                <a th:href="@{/requests/my}">My requests</a>
-                <a th:href="@{/requests/new}">New request</a>
-                <a th:href="@{/helper}">Helper inbox</a>
-
-                <!-- Admin only -->
-                <a sec:authorize="hasRole('ADMIN')"
-                   th:href="@{/admin/helpers}">
-                    Admin: helpers
+                <a th:href="@{/login}"
+                   th:attr="aria-current=${active == 'login'} ? 'page'">
+                    Log in
                 </a>
 
-                <!-- Secure logout -->
+                <a th:href="@{/register}"
+                   th:attr="aria-current=${active == 'register'} ? 'page'">
+                    Register
+                </a>
+            </div>
+
+            <!-- Normal users -->
+            <div sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+                <a th:href="@{/requests/my}"
+                   th:attr="aria-current=${active == 'requests'} ? 'page'">
+                    My requests
+                </a>
+
+                <a th:href="@{/requests/new}"
+                   th:attr="aria-current=${active == 'new'} ? 'page'">
+                    New request
+                </a>
+
+                <a th:href="@{/helper}"
+                   th:attr="aria-current=${active == 'helper'} ? 'page'">
+                    Helper inbox
+                </a>
+
                 <form th:action="@{/logout}" method="post">
                     <button type="submit" class="nav-button">
                         Log out
                     </button>
                 </form>
             </div>
+
+            <!-- Admin users -->
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/helpers}"
+                   th:attr="aria-current=${active == 'admin-helpers'} ? 'page'">
+                    Helpers
+                </a>
+
+                <a th:href="@{/admin/users}"
+                   th:attr="aria-current=${active == 'admin-users'} ? 'page'">
+                    All users
+                </a>
+
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="nav-button">
+                        Log out
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
 
         </div>
     </nav>

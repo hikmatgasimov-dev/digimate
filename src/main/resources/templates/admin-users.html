@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('All users')}">
@@ -5,7 +6,7 @@
     <title>All users | DigiMate</title>
 </head>
 <body>
-<header th:replace="~{fragments/layout :: nav}"></header>
+<header th:replace="~{fragments/layout :: nav('admin-users')}"></header>
 
 <main id="main-content" class="container py-4">
     <h1>All users</h1>
@@ -39,7 +40,7 @@
                     <span class="badge text-bg-success"
                           th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'VERIFIED'}">Verified helper</span>
                     <span class="badge text-bg-warning"
-                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'PENDING'}">Helper, waiting for approval</span>
+                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'PENDING'}">Helper waiting for approval</span>
                     <span class="badge text-bg-danger"
                           th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'REMOVED'}">Helper, removed by an admin</span>
                     <span class="badge text-bg-secondary"
