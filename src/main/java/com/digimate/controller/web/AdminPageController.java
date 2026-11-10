@@ -47,8 +47,8 @@ public class AdminPageController {
 
         model.addAttribute("pending", userService.findPendingHelpers());
         model.addAttribute("reports", complaintService.findOpen());
-        //TODO
-        model.addAttribute("verified", List.of());
+
+        model.addAttribute("verified", userService.findPendingHelpers());
 
         return "admin-helpers";
 
@@ -59,7 +59,7 @@ public class AdminPageController {
     @GetMapping("/admin/users")
     public String usersModel(Model model) {
 
-        model.addAttribute("users", List.of());
+        model.addAttribute("users",  userService.findAll());
         return "admin-users";
     }
 

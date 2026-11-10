@@ -3,15 +3,22 @@ package com.digimate.service;
 
 import com.digimate.dto.RegisterRequest;
 import com.digimate.dto.UserResponse;
+import com.digimate.entity.Complaint;
+import com.digimate.entity.HelpRequest;
 import com.digimate.entity.User;
+import com.digimate.entity.enums.ComplaintStatus;
 import com.digimate.entity.enums.HelperStatus;
+import com.digimate.entity.enums.RequestStatus;
 import com.digimate.entity.enums.Role;
 import com.digimate.exception.EmailAlreadyUsedException;
 import com.digimate.exception.InvalidStatusTransitionException;
 import com.digimate.exception.RequestNotFoundException;
+import com.digimate.repository.ComplaintRepository;
+import com.digimate.repository.HelpRequestRepository;
 import com.digimate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +35,8 @@ import java.util.Locale;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ComplaintRepository complaintRepository;
+    private final HelpRequestRepository helpRequestRepository;
 
     @Transactional
     public UserResponse register(RegisterRequest request){
@@ -78,22 +87,55 @@ public class UserService {
         return UserResponse.from(user);
 
     }
-    /** The admin sees every user. Not implemented yet. */
+
+    /** The admin sees every user, by name. A user has no phone number and no password in the answer. */
     @Transactional(readOnly = true)
-    public List<UserResponse>findAll(){
-        throw new UnsupportedOperationException("not implemented yet");
+    public List<UserResponse>findAll() {
+        return userRepository.findAll(Sort.by("fullName")).stream()
+                .map(UserResponse::from)
+                .toList();
     }
 
-    /** The admin sees the verified helpers. Not implemented yet. */
+    /** The admin sees the verified helpers. */
     @Transactional(readOnly = true)
     public List<UserResponse>findVerifiedHelpers(){
-        throw new UnsupportedOperationException("not implemented yet");
+        return userRepository.findByHelperStatus(HelperStatus.VERIFIED).stream()
+                .map(UserResponse::from)
+                .toList();
     }
-    /** The admin removes a helper. Not implemented yet. */
+      /**
+     * The admin removes a helper. Removal is permanent. Everything happens in one transaction:
+     * the helper is REMOVED, their accepted requests are open again, and their open reports are closed.
+     * Completed requests keep their helper. The reason is checked by the DTO and is not stored.
+     */
     @Transactional
     public UserResponse removeHelper(Long id, RemoveHelperDto dto) {
-        throw new UnsupportedOperationException("not implemented yet");
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RequestNotFoundException("User not found"));
+
+        if (user.getHelperStatus() != HelperStatus.VERIFIED) {
+            throw new InvalidStatusTransitionException("Only a verified helper can be removed.");
+        }
+
+        user.setHelperStatus(HelperStatus.REMOVED);
+
+        List<HelpRequest> accepted = helpRequestRepository.findByHelperAndStatus(user, RequestStatus.ACCEPTED);
+        for (HelpRequest request : accepted) {
+            request.setStatus(RequestStatus.OPEN);
+            request.setHelper(null);
+        }
+
+        List<Complaint> openReports = complaintRepository.findByHelperAndStatus(user, ComplaintStatus.OPEN);
+        for (Complaint report : openReports) {
+            report.setStatus(ComplaintStatus.REMOVED);
+        }
+
+        log.info("Helper removed: userId={}, requestsReopened={}, reportsClosed={}",
+                id, accepted.size(), openReports.size());
+        return UserResponse.from(user);
     }
+
 
 
 }
