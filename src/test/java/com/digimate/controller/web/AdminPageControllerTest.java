@@ -1,9 +1,11 @@
 package com.digimate.controller.web;
 
 import com.digimate.config.SecurityConfig;
+import com.digimate.dto.ComplaintResponse;
 import com.digimate.dto.DismissDto;
 import com.digimate.dto.RemoveHelperDto;
 import com.digimate.dto.UserResponse;
+import com.digimate.entity.enums.ComplaintStatus;
 import com.digimate.entity.enums.HelperStatus;
 import com.digimate.entity.enums.Role;
 import com.digimate.exception.InvalidStatusTransitionException;
@@ -21,6 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -86,18 +89,28 @@ class AdminPageControllerTest {
 
     // ---- the pages ----
 
+
+
     @Test
-    void shouldShowTheWaitingHelpersOnTheHelpersPage() throws Exception {
+    void shouldShowTheWaitingHelpersAndTheOpenReportsOnTheHelpersPage() throws Exception {
         List<UserResponse> pending = List.of(user(3L, "Pending Helper", HelperStatus.PENDING));
+        List<ComplaintResponse> reports = List.of(report(1L));
         when(userService.findPendingHelpers()).thenReturn(pending);
+        when(complaintService.findOpen()).thenReturn(reports);
 
         mockMvc.perform(get("/admin/helpers"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin-helpers"))
                 .andExpect(model().attribute("pending", pending))
-                // empty for now: reports and verified helpers come with the complaint and removal cards
-                .andExpect(model().attribute("reports", List.of()))
+                .andExpect(model().attribute("reports", reports))
+                // empty for now: verified helpers come with the removal card
                 .andExpect(model().attribute("verified", List.of()));
+    }
+
+
+    private static ComplaintResponse report(Long id) {
+        return new ComplaintResponse(id, 4L, 2L, "Helper One", "helper@digimate.test", "Anna",
+                "The helper did not show up.", ComplaintStatus.OPEN, Instant.now());
     }
 
     @Test
