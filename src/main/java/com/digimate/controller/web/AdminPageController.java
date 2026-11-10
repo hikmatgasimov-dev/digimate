@@ -46,8 +46,8 @@ public class AdminPageController {
 
 
         model.addAttribute("pending", userService.findPendingHelpers());
-       //TODO
-        model.addAttribute("reports", List.of());
+        model.addAttribute("reports", complaintService.findOpen());
+        //TODO
         model.addAttribute("verified", List.of());
 
         return "admin-helpers";
@@ -58,7 +58,7 @@ public class AdminPageController {
 
     @GetMapping("/admin/users")
     public String usersModel(Model model) {
-        //TODO
+
         model.addAttribute("users", List.of());
         return "admin-users";
     }
@@ -116,7 +116,7 @@ public class AdminPageController {
         try {
              complaintService.dismiss(id,form);
 
-            redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, " Report closed .The helper stays");
+            redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Report closed. The helper stays.");
             return REDIRECT_HELPERS;
         } catch (RequestNotFoundException e) {
             redirectAttributes.addFlashAttribute(ERROR_MESSAGE, NOT_FOUND);

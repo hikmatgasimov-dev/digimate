@@ -116,4 +116,9 @@ public class GlobalExceptionHandler {
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), message, request.getRequestURI());
         return ResponseEntity.status(status).body(body);
     }
+
+    @ExceptionHandler(DuplicateComplaintException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateComplaint(DuplicateComplaintException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
 }
