@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -99,8 +101,20 @@ class RequestPageControllerTest {
                         .param("preferredTime", preferredTime)
                         .param("mode", "IN_PERSON")
                         .param("place", "City library"))
-                .andExpect(redirectedUrl("/requests/my"));
-
+                .andExpect(redirectedUrl("/requests/my"))
+                .andExpect(flash().attribute(
+                        "errorMessage",
+                        "Creating requests is not available for admins."
+                ));
         verify(helpRequestService, never()).create(any(), any());
+
+    }
+    @Test
+    @WithMockUser(username = "anna@example.test", roles = "USER")
+    void shouldAllowNormalUserToOpenCreateForm() throws Exception {
+        mockMvc.perform(get("/requests/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("request-new"))
+                .andExpect(model().attributeExists("form"));
     }
 }
