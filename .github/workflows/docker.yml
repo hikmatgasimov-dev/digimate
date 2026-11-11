@@ -17,6 +17,10 @@ on:
         description: 'Seconds to wait after starting the container'
         required: false
         default: '5'
+      reset_db:
+        description: 'Delete all data and start with a fresh database (true or false)'
+        required: false
+        default: 'false'
 
 concurrency:
   group: deploy-${{ github.ref_name }}
@@ -99,8 +103,13 @@ jobs:
           -t $APP_IMAGE_TAG \
           -t $APP_IMAGE_NAME:latest \
           .
+    - name: Reset database (only when asked)
+      if: contains(github.event.head_commit.message, '[reset-db]') || github.event.inputs.reset_db == 'true'
+      run: |
+        docker rm -f digimate-db || true
+        docker volume rm digimate-db-data || true
 
-    # DigiMate needs PostgreSQL. It starts once and keeps its data between deploys.
+      # DigiMate needs PostgreSQL. It starts once and keeps its data between deploys.
     - name: Start database
       env:
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
