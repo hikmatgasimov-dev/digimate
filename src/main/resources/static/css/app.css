@@ -414,7 +414,8 @@ textarea {
    ================================== */
 
 .btn-primary,
-.btn-outline-primary {
+.btn-outline-primary,
+.btn-outline-danger{
     min-height: 48px;
     padding: 12px 24px;
     font: inherit;
@@ -462,9 +463,25 @@ textarea {
 }
 
 .btn-primary:focus-visible,
-.btn-outline-primary:focus-visible {
+.btn-outline-primary:focus-visible,
+.btn-outline-danger:focus-visible{
     outline: 3px solid #005fcc;
     outline-offset: 4px;
+}
+
+.btn-outline-danger {
+    background-color: #ffffff;
+    color: #a40000;
+    border-color: #a40000;
+}
+
+.btn-outline-danger:hover:not(:disabled),
+.btn-outline-danger:active:not(:disabled) {
+    background-color: #fdecee;
+    color: #8a0018;
+    border-color: #a40000;
+    box-shadow: none;
+    transform: none;
 }
 
 /* Main buttons: at least 44px tall */
