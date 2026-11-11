@@ -2,7 +2,7 @@
 /* DigiMate shared styles - SCRUM-17 */
 
 :root {
-    font-family: Arial, sans-serif;
+    font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
     font-size: 1.125rem;
     line-height: 1.6;
     color: #1a1a1a;
@@ -16,6 +16,18 @@
 body {
     margin: 0;
     min-height: 100vh;
+}
+
+/* DigiMate heading font */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.brand {
+    font-family: 'Lexend', Arial, sans-serif;
 }
 
 /* Keyboard accessibility */
@@ -113,10 +125,10 @@ textarea:focus {
 
 .card {
     padding: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 14px;
     background-color: #ffffff;
-    border: 2px solid #d1d5db;
-    border-radius: 0.5rem;
+    border: 2px solid #9fb0ba;
+    border-radius: 10px;
 }
 
 .muted {
@@ -217,22 +229,22 @@ textarea {
     line-height: 1;
 }
 
-/* Green primary button */
+/* Teal primary button */
 
 .btn {
-    background-color: #14532d;
+    background-color: #0f766e;
     color: #ffffff;
-    border-color: #0b3b22;
+    border-color: #115e59;
     box-shadow:
-            0 5px 0 #072a18,
+            0 5px 0 #084c47,
             0 7px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn:hover:not(:disabled) {
-    background-color: #0f4526;
+    background-color: #115e59;
     transform: translateY(-2px);
     box-shadow:
-            0 7px 0 #072a18,
+            0 7px 0 #084c47,
             0 10px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -379,19 +391,213 @@ textarea {
 }
 
 .status-accepted {
-    color: #14532d;
-    background-color: #ecfdf3;
-    border-color: #14532d;
+    color: #5a3a00;
+    background-color: #ffe8b3;
+    border-color: #5a3a00;
 }
 
 .status-completed {
-    color: #14532d;
-    background-color: #ffffff;
-    border-color: #14532d;
+    color: #0d4a1f;
+    background-color: #d4f1dc;
+    border-color: #0d4a1f;
 }
 
 .status-cancelled {
     color: #8b0000;
     background-color: #fff0f0;
     border-color: #8b0000;
+}
+
+/* ==================================
+   Shared Bootstrap buttons
+   Moved from pages.css
+   ================================== */
+
+.btn-primary,
+.btn-outline-primary,
+.btn-outline-danger{
+    min-height: 48px;
+    padding: 12px 24px;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1.3;
+    border: 2px solid;
+    border-radius: 12px;
+    box-shadow: none;
+    transform: none;
+    transition: background-color 200ms ease;
+}
+
+/* Primary: teal */
+
+.btn-primary {
+    background-color: #0f766e;
+    color: #ffffff;
+    border-color: #115e59;
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-primary:active:not(:disabled) {
+    background-color: #115e59;
+    color: #ffffff;
+    border-color: #115e59;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Secondary action: gray */
+
+.btn-outline-primary {
+    background-color: #e5e7eb;
+    color: #1a1a1a;
+    border-color: #737373;
+}
+
+.btn-outline-primary:hover:not(:disabled),
+.btn-outline-primary:active:not(:disabled) {
+    background-color: #d1d5db;
+    color: #1a1a1a;
+    border-color: #737373;
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-primary:focus-visible,
+.btn-outline-primary:focus-visible,
+.btn-outline-danger:focus-visible{
+    outline: 3px solid #005fcc;
+    outline-offset: 4px;
+}
+
+.btn-outline-danger {
+    background-color: #ffffff;
+    color: #a40000;
+    border-color: #a40000;
+}
+
+.btn-outline-danger:hover:not(:disabled),
+.btn-outline-danger:active:not(:disabled) {
+    background-color: #fdecee;
+    color: #8a0018;
+    border-color: #a40000;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Main buttons: at least 44px tall */
+
+main .btn {
+    min-height: 48px;
+}
+
+/* ==================================
+   Shared card styles
+   Moved from pages.css
+   ================================== */
+
+.card-body {
+    padding: 16px 20px;
+}
+
+/* Card title and status on one line */
+
+.card-head {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.card-head h3 {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0 0 4px;
+}
+
+.card-head .status {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+/* Category, mode, place and time */
+
+.meta {
+    color: #46535d;
+    margin: 2px 0 8px;
+}
+
+.description {
+    margin: 0 0 6px;
+}
+
+/* Button row */
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.actions form {
+    margin: 0;
+}
+
+/* Empty list box */
+
+.empty {
+    border: 2px dashed #9fb0ba;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+/* Contact box */
+
+.contact-box {
+    margin: 8px 0;
+    padding: 10px 14px;
+}
+
+.contact-box a {
+    color: inherit;
+}
+
+.contact-hint {
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+/* ==================================
+   DigiMate Bootstrap Navbar
+   ================================== */
+
+.navbar-digimate {
+    background-color: #0f766e;
+}
+
+.navbar-digimate .navbar-brand {
+    color: #ffffff;
+}
+
+.navbar-digimate .nav-link {
+    color: #ffffff;
+}
+
+.navbar-digimate .nav-link:hover,
+.navbar-digimate .nav-link[aria-current="page"] {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.navbar-digimate .nav-button {
+    background-color: transparent;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    min-height: 44px;
+}
+
+.navbar-digimate .nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
 }

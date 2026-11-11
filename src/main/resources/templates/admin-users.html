@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('All users')}">
+    <meta charset="UTF-8">
+    <title>All users | DigiMate</title>
+</head>
+<body>
+<header th:replace="~{fragments/layout :: nav('admin-users')}"></header>
+
+<main id="main-content" class="container py-4">
+    <h1>All users</h1>
+    <p class="text-muted">
+        Admins see who is on the platform. Phone numbers and the content of requests are not shown.
+    </p>
+
+    <div class="alert alert-success" role="alert"
+         th:if="${successMessage}" th:text="${successMessage}">Done.</div>
+    <div class="alert alert-danger" role="alert"
+         th:if="${errorMessage}" th:text="${errorMessage}">Something went wrong.</div>
+
+    <p class="text-muted" th:if="${#lists.isEmpty(users)}">There are no users.</p>
+
+    <div class="table-responsive" th:unless="${#lists.isEmpty(users)}">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Account</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="account : ${users}">
+                <td th:text="${account.fullName}">Customer One</td>
+                <td th:text="${account.email}">customer1@digimate.test</td>
+                <td>
+                    <span class="badge text-bg-dark"
+                          th:if="${account.role.name() == 'ADMIN'}">Admin</span>
+                    <span class="badge text-bg-success"
+                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'VERIFIED'}">Verified helper</span>
+                    <span class="badge text-bg-warning"
+                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'PENDING'}">Helper waiting for approval</span>
+                    <span class="badge text-bg-danger"
+                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'REMOVED'}">Helper, removed by an admin</span>
+                    <span class="badge text-bg-secondary"
+                          th:if="${account.role.name() != 'ADMIN' and account.helperStatus.name() == 'NONE'}">Customer</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Status badge -->
+<span th:fragment="badge(request)"
+      class="status"
+      th:classappend="${'status-' + #strings.toLowerCase(request.status)}"
+      th:text="${#strings.capitalize(#strings.toLowerCase(request.status))}">Open</span>
+
+<!-- Request Information -->
+<p th:fragment="meta(request)" class="meta">
+    <span th:text="${request.categoryName}">Phone</span> |
+    <span th:text="${request.mode.name() == 'ONLINE' ? 'Online'
+            : 'In person' + (request.place != null ? ': ' + request.place : '')}">In person: City library</span> |
+    <span th:text="${#temporals.format(request.preferredTime, 'd MMM yyyy, HH:mm')}">10 Nov 2026, 15:00</span>
+</p>
+
+<!-- Contacts -->
+<div th:fragment="contact(request, label)"
+     class="alert alert-success contact-box"
+     th:if="${request.counterpartName}">
+    <div><span th:text="${label + ':'}">Your helper:</span> <b th:text="${request.counterpartName}">Verified Helper</b></div>
+    <div th:if="${request.counterpartPhone}">Phone:
+        <a th:href="${'tel:' + request.counterpartPhone}"><b th:text="${request.counterpartPhone}">+37060000001</b></a>
+    </div>
+    <div th:if="${request.counterpartEmail}">Email:
+        <a th:href="${'mailto:' + request.counterpartEmail}"><b th:text="${request.counterpartEmail}">helper@digimate.test</b></a>
+    </div>
+    <div class="contact-hint">Only you two can see this.</div>
+</div>
+
+<!-- OPEN only-->
+<div th:fragment="open-actions(request)"
+     class="actions"
+     th:if="${request.status.name() == 'OPEN'}">
+    <a class="btn btn-outline-primary btn-sm"
+       th:href="@{/requests/{id}/edit(id=${request.id})}">Edit</a>
+    <form th:action="@{/requests/{id}/cancel(id=${request.id})}" method="post">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Cancel request</button>
+    </form>
+</div>
+
+<!-- COMPLETED only-->
+<th:block th:fragment="review(request)"
+          th:if="${request.status.name() == 'COMPLETED'}">
+
+    <p class="review" th:if="${request.reviewRating != null}">
+        <span th:text="${'Your review: ' + request.reviewRating + ' of 5'}">Your review: 5 of 5</span>
+        <span th:if="${request.reviewComment}" th:text="${'– ' + request.reviewComment}">– Very patient, thank you!</span>
+    </p>
+
+    <form class="review-form"
+          th:if="${request.reviewRating == null}"
+          th:action="@{/requests/{id}/review(id=${request.id})}"
+          method="post">
+        <h4 class="h6">Rate the help</h4>
+        <div class="mb-3">
+            <label class="form-label" for="rating-1" th:for="${'rating-' + request.id}">Rating</label>
+            <select class="form-select" id="rating-1" th:id="${'rating-' + request.id}" name="rating" required>
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Good</option>
+                <option value="3">3 - Okay</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Bad</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="comment-1" th:for="${'comment-' + request.id}">Comment (optional)</label>
+            <textarea class="form-control" id="comment-1" th:id="${'comment-' + request.id}"
+                      name="comment" maxlength="1000" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send rating</button>
+    </form>
+</th:block>
+
+<!-- ACCEPTED or COMPLETED, and only when the controller sends complaintStatuses:
+     the "Report a problem" form, or a note if a report already exists -->
+<th:block th:fragment="report(request, complaintStatuses)"
+          th:if="${complaintStatuses != null
+                  and (request.status.name() == 'ACCEPTED' or request.status.name() == 'COMPLETED')}">
+
+    <p class="alert alert-secondary report-done"
+       th:if="${complaintStatuses[request.id] != null}">You reported a problem. An admin will look at it.</p>
+
+    <details class="report" th:if="${complaintStatuses[request.id] == null}">
+        <summary>Report a problem with this helper</summary>
+        <form th:action="@{/requests/{id}/complaint(id=${request.id})}" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="reason-1" th:for="${'reason-' + request.id}">What went wrong?</label>
+                <textarea class="form-control" id="reason-1" th:id="${'reason-' + request.id}"
+                          name="reason" rows="3" maxlength="500" required
+                          aria-describedby="reason-hint-1"
+                          th:attr="aria-describedby=${'reason-hint-' + request.id}"></textarea>
+                <div class="form-text" id="reason-hint-1" th:id="${'reason-hint-' + request.id}">
+                    Describe what went wrong. Do not write ID or card numbers.
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-danger">Send report</button>
+        </form>
+    </details>
+</th:block>
+
+<!-- Customer card-->
+<article th:fragment="customer-card(request, complaintStatuses)" class="card shadow-sm">
+    <div class="card-body">
+        <div class="card-head">
+            <h3 class="h5" th:text="${request.title}">Set up WhatsApp</h3>
+            <span th:replace="~{fragments/request-parts :: badge(${request})}">Open</span>
+        </div>
+        <p th:replace="~{fragments/request-parts :: meta(${request})}">Phone | In person | 10 Nov 2026, 15:00</p>
+        <p class="description" th:text="${request.description}">Please help me install WhatsApp.</p>
+        <div th:replace="~{fragments/request-parts :: contact(${request}, 'Your helper')}"></div>
+        <div th:replace="~{fragments/request-parts :: open-actions(${request})}"></div>
+        <th:block th:replace="~{fragments/request-parts :: review(${request})}"></th:block>
+        <th:block th:replace="~{fragments/request-parts :: report(${request}, ${complaintStatuses})}"></th:block>
+    </div>
+</article>
+
+<!--Helper Open card-->
+<article th:fragment="open-card(request)" class="card shadow-sm">
+    <div class="card-body">
+        <div class="card-head">
+            <h3 class="h5" th:text="${request.title}">Set up WhatsApp</h3>
+            <span th:replace="~{fragments/request-parts :: badge(${request})}">Open</span>
+        </div>
+        <p th:replace="~{fragments/request-parts :: meta(${request})}">Phone | In person | 10 Nov 2026, 15:00</p>
+        <p class="description" th:text="${request.description}">Please help me install WhatsApp.</p>
+        <div class="actions">
+            <form th:action="@{/helper/requests/{id}/accept(id=${request.id})}" method="post">
+                <button type="submit" class="btn btn-primary btn-sm">Accept</button>
+            </form>
+        </div>
+    </div>
+</article>
+
+<!-- Helper inbox -->
+<article th:fragment="helping-card(request)" class="card shadow-sm">
+    <div class="card-body">
+        <div class="card-head">
+            <h3 class="h5" th:text="${request.title}">Pay bills online</h3>
+            <span th:replace="~{fragments/request-parts :: badge(${request})}">Accepted</span>
+        </div>
+        <p th:replace="~{fragments/request-parts :: meta(${request})}">Banking | Online | 11 Nov 2026, 10:00</p>
+        <div th:replace="~{fragments/request-parts :: contact(${request}, 'Your customer')}"></div>
+        <div class="actions" th:if="${request.status.name() == 'ACCEPTED'}">
+            <form th:action="@{/helper/requests/{id}/complete(id=${request.id})}" method="post">
+                <button type="submit" class="btn btn-outline-primary btn-sm">Mark as completed</button>
+            </form>
+        </div>
+    </div>
+</article>
+
+</body>
+</html>

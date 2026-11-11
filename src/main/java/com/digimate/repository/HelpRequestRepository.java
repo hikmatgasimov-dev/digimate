@@ -16,4 +16,8 @@ public interface HelpRequestRepository extends JpaRepository<HelpRequest, Long> 
     // requests this helper has accepted
     List<HelpRequest> findByHelperOrderByCreatedAtDesc(User helper);
 
+
+    // the requests of one helper in one state (used when the helper is removed)
+    List<HelpRequest> findByHelperAndStatus(User helper, RequestStatus status);
+
 }
