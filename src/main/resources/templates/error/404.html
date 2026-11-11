@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- NEW: Spring Boot shows this page for HTTP 404 (found by its name in templates/error/).
+     No technical details: no exception text, no stack trace. -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Page not found')}">
+    <meta charset="UTF-8">
+    <title>Page not found | DigiMate</title>
+    <link rel="stylesheet" href="../../static/css/app.css">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/layout :: nav('error')}"></header>
+
+<main id="main-content" class="container">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm text-center mt-5">
+                <div class="card-body py-5">
+                    <h1 class="display-6">Page not found</h1>
+                    <p class="lead">We could not find this page.</p>
+                    <a class="btn btn-primary btn-lg" th:href="@{/}">Back to the home page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>
