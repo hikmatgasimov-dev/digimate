@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,15 +20,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Import(JwtConfig.class)
 public class SecurityConfig {
+    private static final String LOGIN_URL = "/login";
 
     @Bean
     @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http) {
 
         http
                 .securityMatcher("/api/**")
-                .csrf(csrf -> csrf.disable())
+                // Stateless JWT API: no session and no cookies, so CSRF does not apply
+                .csrf(AbstractHttpConfigurer::disable) // NOSONAR
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
@@ -55,12 +58,12 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain pageSecurityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http) {
 
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/login",
+                                LOGIN_URL,
                                 "/register",
                                 "/error",
                                 "/css/**",
@@ -73,8 +76,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginPage(LOGIN_URL)
+                        .loginProcessingUrl(LOGIN_URL)
                         .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error")
                         .permitAll()
