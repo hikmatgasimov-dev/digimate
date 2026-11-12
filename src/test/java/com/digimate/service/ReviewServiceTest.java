@@ -89,41 +89,45 @@ class ReviewServiceTest {
 
     @Test
     void shouldThrowNotFoundWhenTheRequestIsMissing() {
+        ReviewDto dto = new ReviewDto(5, null);
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.empty());
 
-        assertThrows(RequestNotFoundException.class, () -> service.create(100L, new ReviewDto(5, null), EMAIL));
+        assertThrows(RequestNotFoundException.class, () -> service.create(100L, dto, EMAIL));
         verify(reviewRepository, never()).save(any());
     }
 
     @Test
     void shouldRefuseWhenTheReviewerIsNotTheCreator() {
+        ReviewDto dto = new ReviewDto(5, null);
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
         when(userRepository.findByEmail("helper@example.test")).thenReturn(Optional.of(helper));
 
         assertThrows(AccessDeniedException.class,
-                () -> service.create(100L, new ReviewDto(5, null), "helper@example.test"));
+                () -> service.create(100L, dto, "helper@example.test"));
         verify(reviewRepository, never()).save(any());
     }
 
     @Test
     void shouldRefuseReviewBeforeTheRequestIsCompleted() {
+        ReviewDto dto = new ReviewDto(5, null);
         request.setStatus(RequestStatus.ACCEPTED);
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
 
         assertThrows(InvalidStatusTransitionException.class,
-                () -> service.create(100L, new ReviewDto(5, null), EMAIL));
+                () -> service.create(100L, dto, EMAIL));
         verify(reviewRepository, never()).save(any());
     }
 
     @Test
     void shouldRefuseASecondReviewForTheSameRequest() {
+        ReviewDto dto = new ReviewDto(5, null);
         when(helpRequestRepository.findById(100L)).thenReturn(Optional.of(request));
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(customer));
         when(reviewRepository.existsByRequestId(100L)).thenReturn(true);
 
         assertThrows(DuplicateReviewException.class,
-                () -> service.create(100L, new ReviewDto(5, null), EMAIL));
+                () -> service.create(100L, dto, EMAIL));
         verify(reviewRepository, never()).save(any());
     }
 }
