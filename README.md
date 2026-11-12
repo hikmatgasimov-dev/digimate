@@ -82,6 +82,47 @@ With the app running, open http://localhost:8080/swagger-ui.html
 2. Click **Authorize**, paste the token, and confirm.
 3. Every `/api/**` call now runs as that user.
 
+## Live site and demo accounts
+
+Live site: https://team1.acnbootcamp.lv
+
+Use these accounts to try the application. The data on the site is demo data only.
+
+| Role | Email | Password |
+|---|---|---|
+| **Admin** | `admin@digimate.test` | `0OpQby6c3zoHgt` |
+| Customer | `customer1@digimate.test` | `0OpQby6c3zoHgt` |
+| Customer | `customer2@digimate.test` | `0OpQby6c3zoHgt` |
+| Verified helper | `helper@digimate.test` | `0OpQby6c3zoHgt` |
+
+These passwords work on the live site only. On your own computer, see "Demo accounts on your own computer" below.
+
+Log in as the admin to approve helpers, view users and handle reports at `/admin/helpers`.
+All demo accounts share one password. The full list of accounts is in [docs/DEMO_DATA.md](docs/DEMO_DATA.md).
+
+### Demo accounts on your own computer
+
+On your own computer the demo accounts get the password that **you** choose. Set `DEMO_PASSWORD`
+(8 to 72 characters, for example `Demo12345`) before you start the application.
+
+IntelliJ: Run > Edit Configurations > DigimateApplication > Environment variables:
+
+```
+DEMO_PASSWORD=Demo12345
+```
+
+Terminal (PowerShell, for this window only):
+
+```powershell
+$env:DEMO_PASSWORD = "Demo12345"
+```
+
+The log then shows `Demo data ready: 7 users and 6 categories created`, and you can log in with the emails above.
+
+- Without `DEMO_PASSWORD` (or with one shorter than 8 characters) only the categories are created, and there are no demo accounts.
+- The accounts are created only the first time. If they already exist in your local database, a new password does not change them. Delete the rows first, for example `DELETE FROM users WHERE email LIKE '%@digimate.test';`, then restart.
+- Do not commit your own passwords. The password in the table above is only for the live site.
+
 ## Running tests
 
 Requirements: Java 21 and a running local PostgreSQL server on `localhost:5432`.
