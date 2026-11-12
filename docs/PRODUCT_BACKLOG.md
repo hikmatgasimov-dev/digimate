@@ -12,8 +12,14 @@ The Jira board (project SCRUM) is the source of truth. This file is a summary.
 - Customer rates a completed request (1 to 5)
 - Swagger documentation, unit tests, seed data, README
 
+## Also delivered
+- Customer reports a problem with a helper (one report per request)
+- Admin dismisses a report, or removes a helper with a reason; the helper's accepted requests become open again
+- Admin users page (no phone numbers)
+- Deployment with Docker and GitHub Actions at https://team1.acnbootcamp.lv
+
 ## Later (not in this version)
-- Notifications, in-app chat, admin statistics and moderation, applying to be a helper after registration, mobile layout
+- Notifications, in-app chat, admin statistics, applying to be a helper after registration, mobile layout
 
 ## Sprints
 - Sprint 0 (2 to 3 Nov): skeleton, entities, security, test setup
