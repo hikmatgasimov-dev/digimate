@@ -184,9 +184,8 @@ To start with an empty database, put `[reset-db]` in the commit message, or run 
 - [Product backlog](docs/PRODUCT_BACKLOG.md)
 - [Page contract](docs/PAGE_CONTRACT.md)
 - [Demo data](docs/DEMO_DATA.md)
-- [Test cases](docs/Testing%20Strategy/TEST_CASES.md)
-- [Unit tests](docs/Testing%20Strategy/UNIT_TESTS.md)
-
+- [Test cases](docs/Test%20Documentation/TEST_CASES.md)
+- [Unit tests](docs/Test%20Documentation/UNIT_TESTS.md)
 ## Team
 
 - Hikmat
